@@ -1,0 +1,22 @@
+{
+    "name": "hjagar/tpofinalpwd",
+    "description": "Trabajo Práctico Final Programación Web Dinámica",
+    "type": "project",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "App\\": "src/",
+            "Framework\\": "framework/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Hjagar",
+            "email": "hjagar@gmail.com"
+        }
+    ],
+    "require": {},
+    "scripts": {
+        "dev": "php -S localhost:8000 -t src/public"       
+    }
+}
