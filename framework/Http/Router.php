@@ -9,6 +9,8 @@ class Router
         'POST' => [],
     ];
 
+    public function __construct() {}
+
     public function get($uri, $action)
     {
         $this->addRoute('GET', $uri, $action);
@@ -30,7 +32,7 @@ class Router
         ];
     }
 
-    public function dispatch($uri, $method)
+    public function dispatch($uri, $method, ?Request $request = null)
     {
         $path = $this->normalize(parse_url($uri, PHP_URL_PATH));
         $method = strtoupper($method);
@@ -45,13 +47,19 @@ class Router
                 }
 
                 [$controller, $func] = $route['action'];
-                call_user_func_array([new $controller, $func], $params);
-                return;
+
+                // Si es POST, agrega el Request como primer parámetro
+                if ($method === 'POST' && $request !== null) {
+                    array_unshift($params, $request);
+                }
+
+                return call_user_func_array([new $controller, $func], $params);
             }
         }
 
         http_response_code(404);
         echo "404 - Ruta no encontrada";
+        return null;
     }
 
     private function normalize($uri)

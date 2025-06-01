@@ -3,9 +3,7 @@
 namespace PhpMvc\Framework\Core;
 
 use PhpMvc\Framework\Http\Kernel;
-use PhpMvc\Framework\Http\HttpStatus;
 use PhpMvc\Framework\Http\Request;
-use PhpMvc\Framework\Http\Response;
 
 class Application
 {
