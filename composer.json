@@ -18,6 +18,7 @@
     "scripts": {
         "dev": [
             "Composer\\Config::disableProcessTimeout",
+            "echo 'Running development server...'\nPress Ctrl+C to stop it.'",
             "php -S localhost:8000 -t src/public"
         ]       
     },

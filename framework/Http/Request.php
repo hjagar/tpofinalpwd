@@ -28,14 +28,24 @@ class Request
 
         if (in_array($key, $attributes)) {
             return $this->$key;
+        } elseif (array_key_exists($key, $this->server)) {
+            return $this->server[$key];
+        } elseif (array_key_exists($key, $this->query)) {
+            return $this->query[$key];
+        } elseif (array_key_exists($key, $this->request)) {
+            return $this->request[$key];
+        } elseif (array_key_exists($key, $this->cookies)) {
+            return $this->cookies[$key];
+        } elseif (array_key_exists($key, $this->files)) {
+            return $this->files[$key];
         } else {
             $method = 'get' . ucfirst($key);
+
             if (method_exists($this, $method)) {
                 return $this->$method();
-            }
-            else {
+            } else {
                 throw new \InvalidArgumentException("Property '$key' does not exist.");
-            }            
+            }
         }
     }
 
@@ -46,6 +56,6 @@ class Request
 
     public function getMethod(): string
     {
-        return strtoupper($this->server['REQUEST_METHOD'] ?? 'GET');
+        return strtoupper($this->server['REQUEST_METHOD'] ?? HttpMethods::GET->value);
     }
 }

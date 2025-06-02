@@ -46,14 +46,22 @@ class Router
                     }
                 }
 
-                [$controller, $func] = $route['action'];
+                $action = $route['action'];
 
                 // Si es POST, agrega el Request como primer parámetro
-                if ($method === 'POST' && $request !== null) {
+                if ($method === HttpMethods::POST->value && $request !== null) {
                     array_unshift($params, $request);
                 }
 
-                return call_user_func_array([new $controller, $func], $params);
+                // Soporta closures y controladores
+                if (is_callable($action)) {
+                    return call_user_func_array($action, $params);
+                } elseif (is_array($action) && count($action) === 2) {
+                    [$controller, $func] = $action;
+                    return call_user_func_array([new $controller, $func], $params);
+                } else {
+                    throw new \InvalidArgumentException('La acción no es válida.');
+                }
             }
         }
 
