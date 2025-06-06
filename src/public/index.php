@@ -12,6 +12,7 @@ use PhpMvc\Framework\Http\Router;
 $router = new Router();
 // TODO: Crear las rutas
 $router->get('/', function () {
+    echo env('DB_CONNECTION');
     return '<h1>Hello World</h1>';
 });
 
@@ -21,6 +22,5 @@ $router->get('/hello/{name}', function ($name) {
 
 $router->get('/hola', [HelloController::class, 'index']);
 $router->get('/hola/{name}', [HelloController::class, 'greet']);
-
-$app = Application::configure($router)->build();
+$app = Application::configure(dirname(__DIR__), $router)->build();
 $app->run();
