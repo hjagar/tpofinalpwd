@@ -15,6 +15,8 @@ class Application
 
     private Kernel $kernel;
 
+    public function __construct(private readonly string $basePath) {}
+
     public function run()
     {
         $response = $this->kernel->handle(Request::createFromGlobals());
@@ -26,8 +28,15 @@ class Application
         $this->kernel = $kernel;
     }
 
-    public static function configure(Router $router): ApplicationBuilder {
-        return new ApplicationBuilder(new self())
-            ->withKernel($router);
+    public function getBasePath(): string
+    {
+        return $this->basePath;
+    }
+
+    public static function configure(string $basePath, Router $router): ApplicationBuilder
+    {
+        return new ApplicationBuilder(new self($basePath))
+            ->withKernel($router)
+            ->withEnvironment();
     }
 }

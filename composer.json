@@ -7,7 +7,10 @@
         "psr-4": {
             "App\\": "src/",
             "PhpMvc\\Framework\\": "framework/"
-        }
+        },
+        "files": [
+            "framework/Support/helpers.php"
+        ]
     },
     "authors": [
         {
@@ -17,9 +20,12 @@
     ],
     "scripts": {
         "dev": [
-            "Composer\\Config::disableProcessTimeout",
-            "echo 'Running development server...'\nPress Ctrl+C to stop it.'",
+            "Composer\\Config::disableProcessTimeout",            
             "php -S localhost:8000 -t src/public"
+        ],
+        "serve": [
+            "Composer\\Config::disableProcessTimeout",
+            "@php serve.php"
         ]       
     },
     "require-dev": {
