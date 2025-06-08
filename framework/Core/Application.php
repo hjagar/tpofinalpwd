@@ -13,9 +13,18 @@ class Application
     public const AUTHOR = 'Gonzalo Molina';
     public const NAME = 'PHP MVC Framework';
 
-    private Kernel $kernel;
+    private static Application $instance;
 
-    public function __construct(private readonly string $basePath) {}
+    private Kernel $kernel;
+    private string $viewPath;
+    private string $compiledViewPath;
+
+    public function __construct(private readonly string $basePath)
+    {
+        $this->viewPath = "{$basePath}/Views";
+        $this->compiledViewPath = "{$this->viewPath}/compiled";
+        static::$instance = $this;
+    }
 
     public function run()
     {
@@ -33,10 +42,25 @@ class Application
         return $this->basePath;
     }
 
+    public function getViewPath(): string
+    {
+        return $this->viewPath;
+    }
+
+    public function getCompiledViewPath(): string
+    {
+        return $this->compiledViewPath;
+    }
+
     public static function configure(string $basePath, Router $router): ApplicationBuilder
     {
         return new ApplicationBuilder(new self($basePath))
             ->withKernel($router)
             ->withEnvironment();
+    }
+
+    public static function getInstance(): Application
+    {
+        return static::$instance;
     }
 }

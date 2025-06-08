@@ -12,8 +12,15 @@ use PhpMvc\Framework\Http\Router;
 $router = new Router();
 // TODO: Crear las rutas
 $router->get('/', function () {
-    echo env('DB_CONNECTION');
-    return '<h1>Hello World</h1>';
+    $variable = 'soy una variable inyectada';
+    $array = [1,2,3,4];
+
+    $arrayOfObjects = [
+        new class { public string $prop1 = "hola"; },
+        new class { public string $prop1 = "mundo"; },
+    ];
+
+    return view('index', compact('variable', 'array', 'arrayOfObjects'));
 });
 
 $router->get('/hello/{name}', function ($name) {

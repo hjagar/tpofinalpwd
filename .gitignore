@@ -2,3 +2,4 @@
 .vscode/
 composer.lock
 .env
+*/storage/views/

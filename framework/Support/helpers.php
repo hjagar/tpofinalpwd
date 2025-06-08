@@ -1,4 +1,8 @@
 <?php
+
+use PhpMvc\Framework\Core\Application;
+use PhpMvc\Framework\View\View;
+
 if (!function_exists('env')) {
     /**
      * Get the value of an environment variable.
@@ -10,5 +14,25 @@ if (!function_exists('env')) {
     function env(string $key, mixed $default = null): mixed
     {
         return $_ENV[$key] ?? $_SERVER[$key] ?? $default;
+    }
+}
+
+if (!function_exists('app')) {
+    function app() {
+        return Application::getInstance();
+    }
+}
+
+if (!function_exists('view')) {
+    function view(string $path, array $data = []): string
+    {
+        $viewsPath = app()->getViewPath();
+        $view = new View($viewsPath);
+
+        return $view->render($path, $data);
+        // extract($data);
+        // ob_start();
+        // require_once "{$viewsPath}/{$path}.view.php";
+        // return ob_get_clean();
     }
 }
