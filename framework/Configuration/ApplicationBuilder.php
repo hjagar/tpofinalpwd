@@ -5,8 +5,6 @@ namespace PhpMvc\Framework\Configuration;
 use PhpMvc\Framework\Core\Application;
 use PhpMvc\Framework\Http\Kernel;
 use PhpMvc\Framework\Http\Router;
-use PhpMvc\Framework\Configuration\Environment;
-
 
 class ApplicationBuilder
 {
@@ -27,10 +25,10 @@ class ApplicationBuilder
         return $this;
     }
 
-    public function withEnvironment(): ApplicationBuilder
+    public function withDotEnv(): ApplicationBuilder
     {
         $path = "{$this->app->getBasePath()}/.env";
-        Environment::load($path);
+        DotEnv::load($path);
         return $this;
     }
 }

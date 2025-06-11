@@ -1,5 +1,6 @@
 <?php
 
+use PhpMvc\Framework\Configuration\DotEnv;
 use PhpMvc\Framework\Core\Application;
 use PhpMvc\Framework\View\View;
 
@@ -13,7 +14,7 @@ if (!function_exists('env')) {
      */
     function env(string $key, mixed $default = null): mixed
     {
-        return $_ENV[$key] ?? $_SERVER[$key] ?? $default;
+        return DotEnv::getOption($key, $default);
     }
 }
 
@@ -30,9 +31,23 @@ if (!function_exists('view')) {
         $view = new View($viewsPath);
 
         return $view->render($path, $data);
-        // extract($data);
-        // ob_start();
-        // require_once "{$viewsPath}/{$path}.view.php";
-        // return ob_get_clean();
+    }
+}
+
+if (!function_exists('auth')) {
+    function auth() {
+
+    }
+}
+
+if (!function_exists('role')) {
+    function role(string $role) {
+
+    }
+}
+
+if (!function_exists('view_echo')) {
+    function view_echo($expr) {
+        return "<?php echo htmlspecialchars($expr, ENT_QUOTES, 'UTF-8'); ?>";
     }
 }

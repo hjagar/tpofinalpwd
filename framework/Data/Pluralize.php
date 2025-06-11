@@ -47,7 +47,7 @@ class Pluralize
     {
         $this->enabled = env('PLURALIZE_TABLE_NAMES', true);
         $this->locale = env('LOCALE', 'en');
-        $json = file_get_contents('./pluralize.json');
+        $json = file_get_contents(__DIR__.'/pluralize.json');
         $this->pluralizeRegex = json_decode($json, true);
     }
 
