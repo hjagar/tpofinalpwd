@@ -13,6 +13,8 @@ $router = new Router();
 // TODO: Crear las rutas
 $router->get('/', function () {
     $variable = 'soy una variable inyectada';
+    $variable2 = 'soy una variable inyectada2';
+    $variable3 = '<script>alert(\'hola mundo\');</script>';
     $array = [1,2,3,4];
 
     $arrayOfObjects = [
@@ -20,11 +22,23 @@ $router->get('/', function () {
         new class { public string $prop1 = "mundo"; },
     ];
 
-    return view('index', compact('variable', 'array', 'arrayOfObjects'));
+    return view('uselayout', compact('variable', 'variable2', 'variable3', 'array'));
 });
 
 $router->get('/hello/{name}', function ($name) {
-    return "<h1>Hello, $name!</h1>";
+    $variable = 'soy una variable inyectada';
+    $variable2 = 'soy una variable inyectada2';
+    $variable3 = '<script>alert(\'hola mundo\');</script>';
+    $array = [1,2,3,4];
+
+    $arrayOfObjects = [
+        new class { public string $prop1 = "hola"; },
+        new class { public string $prop1 = "mundo"; },
+    ];
+
+    return view('uselayout', compact('variable', 'variable2', 'variable3', 'array'));
+
+    //return "<h1>Hello, $name!</h1>";
 });
 
 $router->get('/hola', [HelloController::class, 'index']);

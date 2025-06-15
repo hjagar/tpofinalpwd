@@ -2,7 +2,7 @@
 
 namespace PhpMvc\Framework\Configuration;
 
-class Environment
+class DotEnv
 {
     public static function load(string $path): void
     {
@@ -15,7 +15,7 @@ class Environment
         foreach ($lines as $line) {
             if (!str_starts_with(trim($line), '#')) {
                 [$name, $value] = array_map('trim', explode('=', $line, 2));
-                
+
                 if (!array_key_exists($name, $_ENV)) {
                     putenv("$name=$value");
                     $_ENV[$name] = $value;
@@ -23,5 +23,23 @@ class Environment
                 }
             }
         }
+    }
+
+    public static function getOption($key, $default) {
+        $value = $_ENV[$key] ?? $_SERVER[$key] ?? $default;
+        $returnValue = $value;
+
+        switch($value) {
+            case 'true':
+            case 'yes':
+                $returnValue = true;
+                break;
+            case 'false':
+            case 'no':
+                $returnValue = false;
+                break;
+        }
+
+        return $returnValue;
     }
 }

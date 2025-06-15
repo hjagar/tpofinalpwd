@@ -5,13 +5,15 @@
     <body>
         <h1>Hello World</h1>
         <h2>{{ $variable }}</h2>
+        <h2>{{ $variable2 }}</h2>
+        <p>{!! $variable3 !!}</p>
 
-        @foreach($array as $item)
-        {{ $item }}
-        @endforeach
+        @if ($variable == "hola")
+        <p>hola</p>
+        @endif
 
-        @foreach($arrayOfObjects as $object)
-        {{ $object->prop1 }}
+        @foreach($array as $i)
+        <p>{{ $i }}
         @endforeach
     </body>
 </html>

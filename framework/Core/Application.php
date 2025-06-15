@@ -56,7 +56,7 @@ class Application
     {
         return new ApplicationBuilder(new self($basePath))
             ->withKernel($router)
-            ->withEnvironment();
+            ->withDotEnv();
     }
 
     public static function getInstance(): Application
