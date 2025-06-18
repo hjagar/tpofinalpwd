@@ -46,4 +46,10 @@ class Environment
     {
         return $this->layout;
     }
+
+    public function includeView(string $view, array $data = []) {
+        $viewsPath = app()->getViewPath();
+        $partialView = new View($viewsPath);
+        $partialView->renderPartial($view, $data);
+    }
 }

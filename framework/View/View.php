@@ -28,10 +28,11 @@ class View
         return $returnValue;
     }
 
-    public function render(string $view, array $data)
+    public function render(string $view, array $data=[])
     {
         $viewCompiledFile = $this->compile($view);
-        extract($data);
+        $shared = ViewComposer::getShared();
+        extract($shared + $data);
         $env = Environment::reset();
         ob_start();
         require_once $viewCompiledFile;
@@ -44,7 +45,14 @@ class View
         return ob_get_clean();
     }
 
-    protected function compile($view): string
+    public function renderPartial(string $view, array $data = []) {
+        $viewCompiledFile = $this->compile($view);
+        $shared = ViewComposer::getShared();
+        extract($shared + $data);
+        include $viewCompiledFile;
+    }
+
+    public function compile($view): string
     {
         try {
             $viewFile = $this->getViewFilename($view);

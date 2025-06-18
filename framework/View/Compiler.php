@@ -68,6 +68,7 @@ class Compiler
             $returnValue = "";
 
             if ($replace) {
+                // TODO: verificar si es include o más genérico si tiene mas de un dato en la expr
                 $returnValue = str_replace('expr', $replace, $replacements[$directive]);
             } else {
                 $returnValue = str_replace("@{$directive}", $replace, $replacements[$directive]);

@@ -1,0 +1,175 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    background: #333;
+    color: #fff;
+}
+
+header .logo {
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+header .busqueda {
+    display: flex;
+    gap: 0.5rem;
+}
+
+header input {
+    padding: 0.4rem;
+}
+
+header button {
+    padding: 0.4rem 0.8rem;
+    background: #ff6600;
+    border: none;
+    color: #fff;
+    cursor: pointer;
+}
+
+/* Menu encabezado */
+header nav {
+    background: transparent;
+}
+
+/* Menu principal*/
+nav {
+    background: #444;
+}
+
+nav ul {
+    display: flex;
+    list-style: none;
+    padding: 0.5rem 1rem;
+    gap: 1rem;
+    position: relative;
+}
+
+nav ul li {
+    position: relative;
+}
+
+nav ul li a {
+    color: white;
+    text-decoration: none;
+    padding: 0.5rem;
+    display: block;
+}
+
+nav ul li:hover>a {
+    background-color: #555;
+    border-radius: 5px;
+}
+
+nav ul li ul {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background: #555;
+    padding: 0;
+    list-style: none;
+    min-width: 150px;
+    z-index: 1000;
+    border-radius: 5px;
+}
+
+nav ul li ul li a {
+    padding: 0.5rem;
+    color: white;
+    white-space: nowrap;
+}
+
+nav ul li:hover>ul {
+    display: block;
+}
+
+nav a {
+    color: white;
+    text-decoration: none;
+}
+
+main {
+    display: grid;
+    gap: 2rem;
+    padding: 2rem;
+}
+
+aside {
+    display: none;
+    background: #f4f4f4;
+    padding: 1rem;
+}
+
+aside h2 {
+    margin-bottom: 1rem;
+}
+
+aside ul {
+    list-style: none;
+}
+
+aside li {
+    margin-bottom: 0.5rem;
+}
+
+aside a {
+    text-decoration: none;
+    color: #333;
+}
+
+.productos {
+    background: #fff;
+}
+
+.grid-productos {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 1.5rem;
+}
+
+.producto {
+    background: #fafafa;
+    padding: 1rem;
+    border: 1px solid #ddd;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.producto img {
+    max-width: 100%;
+    height: auto;
+}
+
+.producto button {
+    margin-top: auto;
+    padding: 0.5rem 1rem;
+    background: #28a745;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+footer {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    text-align: center;
+    padding: 1rem;
+    background: #333;
+    color: #fff;
+}

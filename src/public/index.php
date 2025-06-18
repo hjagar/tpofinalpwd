@@ -4,44 +4,39 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/../../vendor/autoload.php';
 
-use App\Controllers\HelloController;
+use App\Controllers\AuthController;
+use App\Controllers\ContactController;
+use App\Controllers\RegisterController;
+use App\Controllers\IndexController;
 use PhpMvc\Framework\Core\Application;
 use PhpMvc\Framework\Http\Router;
 
 // TODO: Crear el objecto Router
 $router = new Router();
-// TODO: Crear las rutas
-$router->get('/', function () {
-    $variable = 'soy una variable inyectada';
-    $variable2 = 'soy una variable inyectada2';
-    $variable3 = '<script>alert(\'hola mundo\');</script>';
-    $array = [1,2,3,4];
 
-    $arrayOfObjects = [
-        new class { public string $prop1 = "hola"; },
-        new class { public string $prop1 = "mundo"; },
-    ];
+// Rutas del Inicio
+$router->get('/', [IndexController::class, 'index'])->name('root');
+$router->get('/{id}', [IndexController::class, 'show'])->name('producto.show');
 
-    return view('uselayout', compact('variable', 'variable2', 'variable3', 'array'));
-});
+// Rutas de autenticación
+$router->get('/login', [AuthController::class, 'index'])->name('login.index');
+$router->post('/login', [AuthController::class, 'login'])->name('login.login');
 
-$router->get('/hello/{name}', function ($name) {
-    $variable = 'soy una variable inyectada';
-    $variable2 = 'soy una variable inyectada2';
-    $variable3 = '<script>alert(\'hola mundo\');</script>';
-    $array = [1,2,3,4];
+// Rutas de registración
+$router->get('/register', [RegisterController::class, 'index'])->name('register.index');
+$router->post('/register', [RegisterController::class, 'store'])->name('regiter.store');
 
-    $arrayOfObjects = [
-        new class { public string $prop1 = "hola"; },
-        new class { public string $prop1 = "mundo"; },
-    ];
+// Rutas de mis compras
 
-    return view('uselayout', compact('variable', 'variable2', 'variable3', 'array'));
 
-    //return "<h1>Hello, $name!</h1>";
-});
+// Rutas del carrito
 
-$router->get('/hola', [HelloController::class, 'index']);
-$router->get('/hola/{name}', [HelloController::class, 'greet']);
+// Rutas de contacto
+$router->get('/contact', [ContactController::class, 'index'])->name('contact.index');
+$router->post('/contact', [ContactController::class, 'store'])->name('contact.store');
+
+// Rutas de administración
+
+
 $app = Application::configure(dirname(__DIR__), $router)->build();
 $app->run();

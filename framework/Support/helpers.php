@@ -51,3 +51,9 @@ if (!function_exists('view_echo')) {
         return "<?php echo htmlspecialchars($expr, ENT_QUOTES, 'UTF-8'); ?>";
     }
 }
+
+if (!function_exists('route')) {
+    function route($routeName) {
+        return app()->getRoute($routeName);
+    }
+}

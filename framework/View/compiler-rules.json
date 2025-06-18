@@ -18,6 +18,7 @@
         "endsection": "<?php $env->endSection(); ?>",
         "yield": "<?php echo $env->yield(expr); ?>",
         "role": "<?php echo if(role(expr)): ?>",
-        "endrole": "<?php endif; ?>"
+        "endrole": "<?php endif; ?>",
+        "include": "<?php echo $env->includeView(expr); ?>"
     }
 }

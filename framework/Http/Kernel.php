@@ -3,6 +3,7 @@
 namespace PhpMvc\Framework\Http;
 
 use PhpMvc\Framework\Core\Application;
+use Exception;
 
 class Kernel
 {
@@ -19,5 +20,14 @@ class Kernel
         ]);
 
         return $response;
+    }
+
+    public function __get($name)
+    {
+        if (property_exists($this, $name)) {
+            return $this->$name;
+        } else {
+            throw new Exception("La propiedad {$name} no existe");
+        }
     }
 }

@@ -49,14 +49,14 @@ class Database
         ];
     }
 
-    private function __get($key)
+    public function __get($key)
     {
         if (property_exists($this, $key)) {
             return $this->$key;
         }
     }
 
-    private function __set($key, $value)
+    public function __set($key, $value)
     {
         if (property_exists($this, $key)) {
             $this->$key = $value;

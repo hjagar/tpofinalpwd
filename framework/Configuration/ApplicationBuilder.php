@@ -31,4 +31,10 @@ class ApplicationBuilder
         DotEnv::load($path);
         return $this;
     }
+
+    public function withAppController($class): ApplicationBuilder
+    {
+        $this->app->setAppController($class);
+        return $this;
+    }
 }

@@ -8,23 +8,9 @@
 <body>
     <header>
         <div class="logo">Tienda Tuya</div>
-        <div class="busqueda">
-            <input type="text" placeholder="Buscar productos..." />
-            <button>Buscar</button>
-        </div>
-        @include('partials.header-menu')
-<!--         <nav>
-            <ul>
-                <li><a href="#">Crear cuenta</a></li>
-                <li><a href="#">Ingresar</a></li>
-                <li><a href="#">Salir</a></li>
-                <li><a href="#">Mis Compras</a></li>
-                <li><a href="#">🛒 (0)</a></li>
-            </ul>
-        </nav> -->
     </header>
     <nav>
-        <ul>
+        <ul><!-- hacer menu dinamico y/o componente con @include -->
             <li><a href="#">Inicio</a></li>
             <li><a href="#">Contacto</a></li>
             <li>

@@ -132,8 +132,7 @@ class QueryBuilder
             $this->setSqlStatement(SelectQueryIndexes::OrderBy, implode(', ', $joinClauses));
         }
 
-        $query = implode(' ', $this->query);
-        $query = trim($query);
+        $query = trim(implode(' ', $this->query['SqlStatement']));
 
         return $query;
     }

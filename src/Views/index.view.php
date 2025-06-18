@@ -1,19 +1,16 @@
-<html>
-    <head>
-        <title>Inicio</title>
-    </head>
-    <body>
-        <h1>Hello World</h1>
-        <h2>{{ $variable }}</h2>
-        <h2>{{ $variable2 }}</h2>
-        <p>{!! $variable3 !!}</p>
-
-        @if ($variable == "hola")
-        <p>hola</p>
-        @endif
-
-        @foreach($array as $i)
-        <p>{{ $i }}
+@extends('layouts.main')
+@section('content')
+<section class="productos">
+    <h2>Productos</h2>
+    <div class="grid-productos">
+        @foreach($productos as $producto)
+        <article class="producto">
+            <img src="https://via.assets.so/game.png?id={{ $producto->idproducto }}&q=95&w=200&h=150&fit=fill" alt="{{ $producto->pronombre }}" />
+            <h3>{{ $producto->pronombre }}</h3>
+            <p>$ {{ number_format($producto->precio, 2, ',', '.')  }}</p>
+            <button>Agregar</button>
+        </article>
         @endforeach
-    </body>
-</html>
+    </div>
+</section>
+@endsection
