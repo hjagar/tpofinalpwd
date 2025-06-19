@@ -1,20 +1,13 @@
 <html>
-
-<head>
-    <title>@yield('title')</title>
-    <link rel="stylesheet" href="/css/styles.css" />
-</head>
-
+@include('partials.head')
 <body>
     <header>
-        <div class="logo">Tienda Tuya</div>
+        @include('partials.logo')
     </header>
     <main>
         @yield('content')
     </main>
-    <footer>
-        <p>&copy; 2025 Tienda Tuya</p>
-    </footer>
+    @include('partials.footer')
 </body>
 
 </html>

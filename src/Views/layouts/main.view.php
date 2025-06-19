@@ -2,45 +2,24 @@
 
 <head>
     <title>@yield('title')</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4Q6Gf2aSP4eDXB8Miphtr37CMZZQ5oXLH2yaXMJ2w8e2ZtHTl7GptT4jmndRuHDT" crossorigin="anonymous">
     <link rel="stylesheet" href="/css/styles.css" />
 </head>
 
 <body>
     <header>
-        <div class="logo">Tienda Tuya</div>
+        @include('partials.logo')
         <div class="busqueda">
             <input type="text" placeholder="Buscar productos..." />
             <button>Buscar</button>
         </div>
         @include('partials.header-menu')
-<!--         <nav>
-            <ul>
-                <li><a href="#">Crear cuenta</a></li>
-                <li><a href="#">Ingresar</a></li>
-                <li><a href="#">Salir</a></li>
-                <li><a href="#">Mis Compras</a></li>
-                <li><a href="#">🛒 (0)</a></li>
-            </ul>
-        </nav> -->
     </header>
-    <nav>
-        <ul>
-            <li><a href="#">Inicio</a></li>
-            <li><a href="#">Contacto</a></li>
-            <li>
-                <a href="#" style="color:red;">Administración</a>
-                <ul>
-                    <li><a href="#">Submenu</a></li>
-                </ul>
-            </li>
-        </ul>
-    </nav>
+    @include('partials.main-menu-static')
     <main>
         @yield('content')
     </main>
-    <footer>
-        <p>&copy; 2025 Tienda Tuya</p>
-    </footer>
+    @include('partials.footer')
 </body>
 
 </html>

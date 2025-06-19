@@ -16,7 +16,7 @@ $router = new Router();
 
 // Rutas del Inicio
 $router->get('/', [IndexController::class, 'index'])->name('root');
-$router->get('/{id}', [IndexController::class, 'show'])->name('producto.show');
+$router->get('/product/{id}', [IndexController::class, 'show'])->name('producto.show');
 
 // Rutas de autenticación
 $router->get('/login', [AuthController::class, 'index'])->name('login.index');

@@ -19,7 +19,8 @@ if (!function_exists('env')) {
 }
 
 if (!function_exists('app')) {
-    function app() {
+    function app()
+    {
         return Application::getInstance();
     }
 }
@@ -35,25 +36,58 @@ if (!function_exists('view')) {
 }
 
 if (!function_exists('auth')) {
-    function auth() {
-
-    }
+    function auth() {}
 }
 
 if (!function_exists('role')) {
-    function role(string $role) {
-
-    }
+    function role(string $role) {}
 }
 
 if (!function_exists('view_echo')) {
-    function view_echo($expr) {
+    function view_echo($expr)
+    {
         return "<?php echo htmlspecialchars($expr, ENT_QUOTES, 'UTF-8'); ?>";
     }
 }
 
 if (!function_exists('route')) {
-    function route($routeName) {
+    function route($routeName)
+    {
         return app()->getRoute($routeName);
+    }
+}
+
+if (!function_exists('sessionStarted')) {
+    function sessionStarted(): bool {
+        return session_status() === PHP_SESSION_ACTIVE;
+    }
+}
+
+if (!function_exists('generateCsrfToken')) {
+    function generateCsrfToken()
+    {
+        if (empty($_SESSION['csrf_token'])) {
+            $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+        }
+    }
+}
+
+if (!function_exists('regenerateCsrfToken')){
+    function regenerateCsrfToken() {
+        unset($_SESSION['csrf_token']);
+        generateCsrfToken();
+    }
+}
+
+if (!function_exists('csrf')) {
+    function csrf() {
+        $returnValue = "";
+
+        if(sessionStarted()){
+            $csrfToken = $_SESSION['csrf_token'];
+            $returnValue = "<input type=\"hidden\" id=\"csrf_token\" name=\"csrf_token\" value=\"{$csrfToken}\" />";
+        }
+        
+        return $returnValue;
     }
 }

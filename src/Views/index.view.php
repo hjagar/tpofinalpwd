@@ -1,4 +1,9 @@
 @extends('layouts.main')
+
+@section('title')
+Tienda Tuya
+@endsection
+
 @section('content')
 <section class="productos">
     <h2>Productos</h2>

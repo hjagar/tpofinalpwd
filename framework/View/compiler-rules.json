@@ -19,6 +19,7 @@
         "yield": "<?php echo $env->yield(expr); ?>",
         "role": "<?php echo if(role(expr)): ?>",
         "endrole": "<?php endif; ?>",
-        "include": "<?php echo $env->includeView(expr); ?>"
+        "include": "<?php echo $env->includeView(expr); ?>",
+        "csrf": "<?php echo csrf(); ?>"
     }
 }
