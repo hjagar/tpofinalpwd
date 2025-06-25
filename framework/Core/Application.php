@@ -88,7 +88,9 @@ class Application
         return static::$instance;
     }
 
-    public function getRoute($routeName) {
-        return $this->kernel->router->findRouteByName($routeName);
+    public function getRoute($routeName, $parameters=[]) {
+        $routeUrl = $this->kernel->router->findRouteByName($routeName);
+
+        return $routeUrl; //? $route->uri : null;
     }
 }

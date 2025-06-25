@@ -1,1 +1,1 @@
-<div class="logo">Tienda Tuya</div>
+<div class="logo">{{ env('APP_NAME') }}</div>

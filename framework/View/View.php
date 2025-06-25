@@ -55,19 +55,53 @@ class View
     public function compile($view): string
     {
         try {
+            $viewCompiledMap = $this->loadViewCompiledMap();
             $viewFile = $this->getViewFilename($view);
             $viewCompiledFile = $this->getViewCompiledFilename($viewFile);
+            
+            if (!empty($viewCompiledMap) && isset($viewCompiledMap[$viewFile])) {
+                if ($viewCompiledFile !== $viewCompiledMap[$viewFile]) {
+                    unlink($viewCompiledMap[$viewFile]);
+                };
+            } 
 
             if ((!file_exists($viewCompiledFile) || filemtime($viewCompiledFile) < filemtime($viewFile)) || !$this->cacheEnabled) {
                 $viewContent = file_get_contents($viewFile);
                 $viewCompiledContent = $this->compiler->compile($viewContent);
                 file_put_contents($viewCompiledFile, $viewCompiledContent);
+                $viewCompiledMap[$viewFile] = $viewCompiledFile;
+                $this->saveViewCompiledMap($viewCompiledMap);
             }
         } catch (Exception $exc) {
             throw new Exception("La vista {$view} no encontrada", previous: $exc);
         }
 
         return $viewCompiledFile;
+    }
+
+    private function loadViewCompiledMap() {
+        $returnValue = [];
+        $viewCompiledMapFile = $this->getViewCompiledMapFilename();
+
+        if (file_exists($viewCompiledMapFile)) {
+            $returnValue = json_decode(file_get_contents($viewCompiledMapFile), true);
+        }
+
+        return $returnValue;
+    }
+
+    private function saveViewCompiledMap(array $map) {
+        $viewCompiledMapFile = $this->getViewCompiledMapFilename();
+        file_put_contents($viewCompiledMapFile, json_encode($map));
+    }
+
+    private function getViewCompiledMapFilename(): string
+    {
+        return "{$this->cachePath}/view-compiled-map.json";
+    }
+
+    private function verifyCompiledFile(){
+
     }
 
     private function getViewFilename(string $view): string

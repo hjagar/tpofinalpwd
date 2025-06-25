@@ -4,10 +4,25 @@
   Inicio de sesión
 @endsection
 
+@section('javascript')
+  <script>
+    function validateForm() {
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+
+      if (!email || !password) {
+        alert('Por favor, complete todos los campos.');
+        return false;
+      }
+      return true;
+    }
+  </script>
+@endsection
+
 @section('content')
   <section class="auth-form">
     <h2>Inicio de sesión</h2>
-    <form method="POST" action="{{ route('login.index') }}">
+    <form method="POST" action="{{ route('auth.login') }}" onsubmit="return validateForm()">
       @csrf
       <div class="mb-3">
         <label for="email" class="form-label">Correo electrónico</label>

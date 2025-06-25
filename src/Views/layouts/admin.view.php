@@ -4,7 +4,7 @@
     <header>
         @include('partials.logo')
     </header>
-    @include('partials.main-menu-static')
+    @include('partials.main-menu')
     <main>
         @yield('content')
     </main>

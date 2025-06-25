@@ -29,9 +29,10 @@ class Kernel
         $route = $this->router->match($uri, $method);
         $group = $route?->middlewareGroup ?? 'web';
         $middlewares = $this->middlewareGroups[$group] ?? [];
+        $middlewares = array_merge($middlewares, $route->middlewares);
 
         $content = $this->handleMiddlewareChain($middlewares, $request, function ($request) use ($uri, $method) {
-            return $this->router->dispatch($uri, $method);
+            return $this->router->dispatch($uri, $method, $request);
         });
 
         //$content = $this->router->dispatch($request->getUri(), $request->getMethod());

@@ -10,8 +10,8 @@ Tienda Tuya
     <div class="grid-productos">
         @foreach($productos as $producto)
         <article class="producto">
-            <img src="https://via.assets.so/game.png?id={{ $producto->idproducto }}&q=95&w=200&h=150&fit=fill" alt="{{ $producto->pronombre }}" />
-            <h3>{{ $producto->pronombre }}</h3>
+            <img src="https://via.assets.so/game.png?id={{ $producto->idproducto }}&q=95&w=200&h=150&fit=fill" alt="{{ $producto->nombre }}" />
+            <h3>{{ $producto->nombre }}</h3>
             <p>$ {{ number_format($producto->precio, 2, ',', '.')  }}</p>
             <button>Agregar</button>
         </article>

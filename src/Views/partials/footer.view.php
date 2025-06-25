@@ -1,3 +1,3 @@
 <footer>
-    <p>&copy; 2025 Tienda Tuya</p>
+    <p>&copy; 2025 {{ env('APP_NAME') }}</p>
 </footer>

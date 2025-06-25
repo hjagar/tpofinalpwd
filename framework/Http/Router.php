@@ -12,12 +12,12 @@ class Router
     ];
 
     public function __construct() {}
-    
-    public function __get($name) {
+
+    public function __get($name)
+    {
         if (property_exists($this, $name)) {
             return $this->$name;
-        }
-        else{
+        } else {
             throw new Exception("La propiedad {$name} no existe");
         }
     }
@@ -71,7 +71,8 @@ class Router
         return null;
     }
 
-    public function match(string $uri, string $method): ?Route {
+    public function match(string $uri, string $method): ?Route
+    {
         $returnValue = null;
         $routes = $this->routes[strtoupper($method)];
         $route = array_find($routes, fn($ro) => $ro->uri === $uri);
@@ -83,7 +84,8 @@ class Router
         return $returnValue;
     }
 
-    public function findRouteByName($routeName): string {
+    public function findRouteByName($routeName): string
+    {
         $returnValue = "";
         $routes = [...$this->routes['GET'], ...$this->routes['POST']];
         $route = array_find($routes, fn($ro) => $ro->routeName === $routeName);

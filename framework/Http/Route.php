@@ -8,6 +8,7 @@ class Route
 {
     private ?string $routeName = null;
     private ?string $middlewareGroupName = null;
+    private array $middlewares = [];
 
     public function __construct(private string $regex, private array $paramNames, private $action, private string $uri) {}
 
@@ -45,7 +46,17 @@ class Route
         return $this;
     }
 
+    public function middleware(string $middleware) {
+        $this->middlewares[] = $middleware;
+  
+        return $this;
+    }
+
     public function getMiddlewareGroup() {
         return $this->middlewareGroupName;
+    }
+
+    public function getMiddlewares() {
+        return $this->middlewares;
     }
 }

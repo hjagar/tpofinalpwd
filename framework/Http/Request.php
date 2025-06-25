@@ -2,15 +2,28 @@
 
 namespace PhpMvc\Framework\Http;
 
+use PhpMvc\Framework\Concerns\HasProperty;
+
 class Request
 {
+    use HasProperty;
+
     public function __construct(
         private readonly array $query = [],
         private readonly array $request = [],
         private readonly array $cookies = [],
         private readonly array $files = [],
         private readonly array $server = []
-    ) {}
+    ) {
+        $this->setPropertyContainers([
+            $this,
+            $this->query,
+            $this->request,
+            $this->cookies,
+            $this->files,
+            $this->server
+        ]);
+    }
 
     /**
      * Create a Request instance from global variables.
@@ -24,9 +37,7 @@ class Request
 
     public function __get(string $key)
     {
-        $attributes = ['query', 'request', 'cookies', 'files', 'server'];
-
-        if (in_array($key, $attributes)) {
+        if (property_exists($this, $key)) {
             return $this->$key;
         } elseif (array_key_exists($key, $this->server)) {
             return $this->server[$key];
@@ -57,5 +68,10 @@ class Request
     public function getMethod(): string
     {
         return strtoupper($this->server['REQUEST_METHOD'] ?? HttpMethods::GET->value);
+    }
+
+    public function all(): array
+    {
+        return array_merge($this->query, $this->request);
     }
 }

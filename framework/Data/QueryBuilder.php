@@ -2,12 +2,15 @@
 
 namespace PhpMvc\Framework\Data;
 
+use PhpMvc\Framework\Concerns\SplitKey;
 use PhpMvc\Framework\Data\Constants\QueryBuilderIndexes;
 use PhpMvc\Framework\Data\Constants\SelectQueryIndexes;
 
 class QueryBuilder
 {
     private array $query;
+
+    use SplitKey;
 
     /**
      * El constructor de QueryBuilder crea una propiedad privada $query donde el primer elemento
@@ -32,6 +35,12 @@ class QueryBuilder
     }
 
     #region Magic Methods
+    /**
+     * Permite acceder a propiedades del modelo o de la clase QueryBuilder.
+     * Si la propiedad existe en la clase QueryBuilder, la devuelve directamente.
+     * Si la propiedad existe en el modelo, la devuelve a través del modelo.
+     * Si la propiedad no existe en ninguno de los dos, lanza una excepción.
+     */
     public function __get($name)
     {
         $returnValue = null;
@@ -47,6 +56,12 @@ class QueryBuilder
         return $returnValue;
     }
 
+    /**
+     * Permite llamar a métodos que no están definidos en la clase QueryBuilder o en el modelo.
+     * Si el método existe en la clase QueryBuilder, lo llama directamente.
+     * Si el método existe en el modelo, lo llama a través del modelo.
+     * Si el método no existe en ninguno de los dos, lanza una excepción.
+     */
     public function __call($name, $arguments)
     {
         $returnValue = null;
@@ -82,16 +97,22 @@ class QueryBuilder
         return $this;
     }
 
-    public function where(?array $conditions = null): QueryBuilder
+    public function where(array $conditions): QueryBuilder
     {
-        if ($conditions === null) {
-            $conditions = $this->getPrimaryKey();
-        }
+        // if ($conditions === null) {
+        //     $conditions = array_flip($this->getPrimaryKey());
+        // }
 
-        $whereClauses = array_map(fn($key) => "{$key} = :{$key}", array_keys($conditions));
+        $whereClauses = array_map(fn($key) => "{$key} = :{$this->splitKey($key)}", array_keys($conditions));
+        // $whereClauses = array_map(function ($key) {
+        //     //$splittedKey = explode('.', $key);
+        //     $paramKey = $this->splitKey($key);
+        //     return "{$key} = :{$paramKey}";
+        // }, array_keys($conditions));
         $whereConditions = $this->query[QueryBuilderIndexes::WhereConditions];
         $whereConditions = array_unique(array_merge($whereConditions, $whereClauses));
         $this->query[QueryBuilderIndexes::WhereConditions] = $whereConditions;
+        $this->model->prepareParams($conditions);
 
         return $this;
     }
@@ -140,13 +161,18 @@ class QueryBuilder
     public function join($relations): QueryBuilder
     {
         $modelRelations = $this->model->relations;
+
+        if (is_string($relations)) {
+            $relations = [$relations];
+        }
+
         $currentRelations = array_intersect(array_keys($modelRelations), $relations);
         $joinClauses = [];
 
         foreach ($currentRelations as $relation) {
             [$relationType] = $modelRelations[$relation];
             $methodName = lcfirst($relationType);
-            $joinClauses[] = $this->$methodName($modelRelations[$relation]);
+            $joinClauses = array_merge($joinClauses, $this->$methodName($modelRelations[$relation]));
         }
 
         if (!empty($joinClauses)) {

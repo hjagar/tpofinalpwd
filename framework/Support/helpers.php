@@ -3,6 +3,7 @@
 use PhpMvc\Framework\Configuration\DotEnv;
 use PhpMvc\Framework\Core\Application;
 use PhpMvc\Framework\View\View;
+use PhpMvc\Framework\Http\RedirectResponse;
 
 if (!function_exists('env')) {
     /**
@@ -40,7 +41,9 @@ if (!function_exists('auth')) {
 }
 
 if (!function_exists('role')) {
-    function role(string $role) {}
+    function role(string $role) {
+        return true; // Placeholder for role checking logic
+    }
 }
 
 if (!function_exists('view_echo')) {
@@ -51,9 +54,9 @@ if (!function_exists('view_echo')) {
 }
 
 if (!function_exists('route')) {
-    function route($routeName)
+    function route($routeName, $parameters=[])
     {
-        return app()->getRoute($routeName);
+        return app()->getRoute($routeName, $parameters);
     }
 }
 
@@ -89,5 +92,22 @@ if (!function_exists('csrf')) {
         }
         
         return $returnValue;
+    }
+}
+
+if (!function_exists('redirect')) {
+    function redirect(string $routeName, $parameters=[]): RedirectResponse
+    {
+        $url = app()->getRoute($routeName, $parameters);
+        return new RedirectResponse($url);
+    }
+}
+
+if (!function_exists('abort')) {
+    function abort(int $statusCode, string $message = ''): void
+    {
+        http_response_code($statusCode);
+        echo $message;
+        exit;
     }
 }

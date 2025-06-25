@@ -1,7 +1,7 @@
 <li>
-    <a href="{{ $item->url }}">{{ $item->menombre }}</a>
+    <a href="{{ route($item->url) ?: '#NotImplemented#' }}">{{ $item->nombre }}</a>
 
-    @if(!empty($item->children))
+    @if($item->isPropertySet('children'))
         <ul>
             @foreach($item->children as $child)
                 @include('partials.menu-item', ['item' => $child])

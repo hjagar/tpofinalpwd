@@ -4,10 +4,12 @@ namespace PhpMvc\Framework\Data;
 
 use ArrayObject;
 use Exception;
+use PhpMvc\Framework\Concerns\SplitKey;
 use ReflectionClass;
 use PhpMvc\Framework\Data\Database;
 use PhpMvc\Framework\Data\Constants\ModelAffixes;
 use PhpMvc\Framework\Data\Constants\ModelRelations;
+use PhpMvc\Framework\Http\Request;
 
 abstract class Model
 {
@@ -15,7 +17,8 @@ abstract class Model
     protected string $table = '';
     protected string | array $primaryKey = 'id';
     protected bool $autoIncrement = true;
-    protected array $relations = []; // TODO: Implementar relaciones
+    protected array $relations = [];
+    protected array $fillable = [];
     #endregion
 
     #region Private Properties
@@ -28,7 +31,10 @@ abstract class Model
     private string $primaryKeyPreffix;
     private string $primaryKeySuffix;
     private array $params = [];
+    private string $mapToClass = '';
     #endregion
+
+    use SplitKey;
 
     #region Constructor
     public function __construct()
@@ -38,6 +44,7 @@ abstract class Model
         $this->queryBuilder = new QueryBuilder($this);
         $this->primaryKeyPreffix = env('PRIMARY_KEY_PREFFIX', ModelAffixes::none->value);
         $this->primaryKeySuffix = env('PRIMARY_KEY_SUFFIX', ModelAffixes::none->value);
+
     }
     #endregion
 
@@ -76,6 +83,8 @@ abstract class Model
             $returnValue = call_user_func_array([$this, $name], $arguments);
         } elseif (array_key_exists($name, $this->relations)) {
             $returnValue = $this->getRelationQueryable($name);
+        } elseif (method_exists($this->queryBuilder, $name)) {
+            $returnValue = call_user_func_array([$this->queryBuilder, $name], $arguments);
         } else {
             throw new Exception("Method {$name} does not exist in " . static::class);
         }
@@ -99,13 +108,14 @@ abstract class Model
     {
         $instance = new static();
         $queryBuilder = $instance->queryBuilder;
-        $params = $instance->prepareParams($id, $instance->getPrimaryKey());
+        //$instance->params = $instance->prepareParams($id, $instance->getPrimaryKey());
+        $conditions = array_combine($instance->getPrimaryKey(), $id);
         $query = $queryBuilder
             ->select()
             ->from()
-            ->where()
+            ->where($conditions)
             ->getQuery();
-        $data = $instance->database->fetchOne($query, $params);
+        $data = $instance->database->fetchOne($query, $instance->params);
 
         return $instance->mapToObject($data);
     }
@@ -131,8 +141,8 @@ abstract class Model
     /**
      * Find records based on specified conditions.
      *
-     * @param mixed ...$conditions The conditions to filter the records.
-     * @return array Returns an array of model instances that match the conditions.
+     * @param array $conditions The conditions to filter the records.
+     * @return QueryBuilder Returns a QueryBuilder instance for further querying.
      * @example
      * ```php
      * $models = Model::where(['status' => 'active', 'category' => 'news'])->get();
@@ -140,11 +150,11 @@ abstract class Model
      * This method allows you to specify conditions as key-value pairs, where the key 
      * is the column name and the value is the value to match.
      */
-    public static function where($conditions): QueryBuilder
+    public static function where(array $conditions): QueryBuilder
     {
         $instance = new static();
         $queryBuilder = $instance->queryBuilder;
-        $instance->params = $instance->prepareParams($conditions);
+        //$instance->params = $instance->prepareParams($conditions);
         $queryBuilder
             ->select()
             ->from()
@@ -172,61 +182,62 @@ abstract class Model
             ->from()
             ->join(...$relations);
     }
+
+    public static function rawQuery(string $queryMethodName, array $params = []): bool
+    {
+        $instance = new static();
+        return $instance->database->execute($instance->$queryMethodName(), $params);
+    }
+
+    public static function rawQueryAll(string $queryMethodName, array $params = []): array
+    {
+        $instance = new static();
+        $data = $instance->database->fetchAll($instance->$queryMethodName(), $params);
+        return $instance->mapDataToObjects($data);
+    }
+
+    public static function rawQueryOne(string $queryMethodName, array $params = []): ?static
+    {
+        $instance = new static();
+        $data = $instance->database->fetchOne($instance->$queryMethodName(), $params);
+        return $instance->mapToObject($data);
+    }
+
     #endregion
 
     #region Instance Public Methods
+    public function hasProperty(string $property): bool
+    {
+        return property_exists($this, $property) || array_key_exists($property, $this->attributes) || array_key_exists($property, $this->relations);
+    }
+
+    public function isPropertyEmpty(string $property): bool
+    {
+        $propertyValue = $this->$property ?? null;
+        return empty($propertyValue);
+    }
+    /**
+     * Check if a property is set in the model.
+     *
+     * @param string $property The name of the property to check.
+     * @return bool Returns true if the property is set, false otherwise.
+     * @example
+     * ```php
+     * if ($model->isPropertySet('name')) {
+     *     // Do something with $model->name
+     * }
+     * ```
+     */
+    public function isPropertySet(string $property): bool
+    {
+        return $this->hasProperty($property) && !$this->isPropertyEmpty($property);
+    }
+
     public function get(): array
     {
         [$query, $params] = $this->getQueryAndParams();
         $data = $this->database->fetchAll($query, $params);
         $returnValue = $this->mapDataToObjects($data);
-
-        return $returnValue;
-    }
-
-    private function getRelation(string $relationName): ?ArrayObject
-    {
-        $returnValue = null;
-
-        if (array_key_exists($relationName, $this->relations)) {
-            [$relationType, $modelClass] = $this->relations[$relationName];
-            $modelInstance = new $modelClass();
-
-            if ($relationType === ModelRelations::HasMany) {
-                $returnValue = new ArrayObject($modelInstance->where([$modelInstance->getPrimaryKey()[0] => $this->attributes[$this->getPrimaryKey()[0]]])->get());
-            } elseif ($relationType === ModelRelations::BelongsTo) {
-                $returnValue = $modelInstance->find($this->attributes[$modelInstance->getPrimaryKey()[0]]);
-            }
-        }
-
-        return $returnValue;
-    }
-
-    private function getRelationQueryable(string $relationName): QueryBuilder
-    {
-        $returnValue = null;
-
-        if (array_key_exists($relationName, $this->relations)) {
-            [$relationType, $modelClass] = $this->relations[$relationName];
-            $modelInstance = new $modelClass();
-
-            if ($relationType === ModelRelations::HasMany) {
-                $returnValue = $modelInstance->where([$modelInstance->getPrimaryKey()[0] => $this->attributes[$this->getPrimaryKey()[0]]]);
-            } elseif ($relationType === ModelRelations::BelongsTo) {
-                $returnValue = $modelInstance->where([$modelInstance->getPrimaryKey()[0] => $this->attributes[$modelInstance->getPrimaryKey()[0]]]);
-            }
-        }
-
-        return $returnValue;
-    }
-
-    private function mapDataToObjects(array $data): array
-    {
-        $returnValue = [];
-
-        if ($data) {
-            $returnValue = array_map(fn($row) => $this->mapToObject($row), $data);;
-        }
 
         return $returnValue;
     }
@@ -361,6 +372,16 @@ abstract class Model
 
         return $returnValue;
     }
+
+    public function fill(array $fields): void
+    {
+        $postFields = array_keys($fields);
+        $fieldsToFill = array_intersect($this->fillable, $postFields) ?: $postFields;
+
+        foreach ($fieldsToFill as $field) {
+            $this->$field = $fields[$field] ?? null;
+        }
+    }
     #endregion
 
     #region Private Methods
@@ -415,26 +436,28 @@ abstract class Model
         return $this->getAffix($this->primaryKeySuffix);
     }
 
-    private function prepareParams(array $params, ?array $paramKeys = null): array
+    public function prepareParams(array $params, ?array $paramKeys = null): array
     {
         if ($paramKeys === null) {
             $paramKeys = array_keys($params);
         }
 
-        return array_combine(
+        $this->params = array_combine(
             $this->makePlaceholders($paramKeys),
             array_values($params)
         );
+
+        return $this->params;
     }
 
-    private function mapToObject(array $data): ?static
+    private function mapToObject(array $data)
     {
         $object = null;
 
         if (!empty($data)) {
-            $object = new static();
+            $object = $this->mapToClass ? new $this->mapToClass() : new static();
             $object->attributes = $data;
-            $object->primaryKeyAttributes = array_intersect_key($data, array_flip($this->getPrimaryKey()));
+            $object->primaryKeyAttributes = array_intersect_key($data, array_flip($object->getPrimaryKey()));
             $object->isNewRecord = false;
         }
 
@@ -443,7 +466,11 @@ abstract class Model
 
     private function makePlaceholders(array $columns): array
     {
-        return array_map(fn($col) => ":{$col}", $columns);
+        return array_map(fn($key) => ":{$this->splitKey($key)}", $columns);
+        // return array_map(function($key) {
+        //     $paramKey = $this->splitKey($key);
+        //     return ":{$paramKey}";
+        // }, $columns);
     }
 
     private function setQueryAndParams(string $query, array $params): void
@@ -455,6 +482,139 @@ abstract class Model
     private function getQueryAndParams(): array
     {
         return [$this->queryBuilder->getQuery(), $this->params];
+    }
+
+    private function getRelation(string $relationName): ?ArrayObject
+    {
+        $returnValue = null;
+
+        if (array_key_exists($relationName, $this->relations)) {
+            [$relationType, $modelClass] = $this->relations[$relationName];
+            $modelInstance = new $modelClass();
+
+            if ($relationType === ModelRelations::HasMany) {
+                $returnValue = new ArrayObject($modelInstance->where([$modelInstance->getPrimaryKey()[0] => $this->attributes[$this->getPrimaryKey()[0]]])->get());
+            } elseif ($relationType === ModelRelations::BelongsTo) {
+                $returnValue = $modelInstance->find($this->attributes[$modelInstance->getPrimaryKey()[0]]);
+            }
+        }
+
+        return $returnValue;
+    }
+
+    private function getRelationQueryable(string $relationName): ?QueryBuilder
+    {
+        $returnValue = null;
+
+        if (array_key_exists($relationName, $this->relations)) {
+            [$relationType, $modelClass] = $this->relations[$relationName];
+            $this->mapToClass = $modelClass;
+            $modelInstance = new $modelClass();
+            $modelTableName = $modelInstance->getTableName();
+            $this->queryBuilder
+                ->select("{$modelTableName}.*")
+                ->from()
+                ->join($relationName);
+            $primaryKey = $this->getPrimaryKey()[0];
+            $tableName = $this->getTableName();
+            $primaryKeyFullName = "{$tableName}.{$primaryKey}";
+            $returnValue = $this->queryBuilder->where([$primaryKeyFullName => $this->attributes[$primaryKey]]);
+
+            //$this->param = $this->prepareParams();
+            // if ($relationType === ModelRelations::HasMany) {
+            //     /* 
+            //     $this: Compra,
+            //     $modelInstance: CompraItem,
+            //     relation: items,
+            //     $this->getPrimaryKey()[0]: 'idcompra',
+            //     $this->attributes[$this->getPrimaryKey()[0]]: <ID de la compra X>
+            //     descripcion: Filtro los CompraItem que tienen el idcompra igual al id de la compra actual.
+            //     */
+            //     $returnValue = $this->queryBuilder->where([$this->getPrimaryKey()[0] => $this->attributes[$this->getPrimaryKey()[0]]]);
+            // } elseif ($relationType === ModelRelations::BelongsTo) {
+            //     /*
+            //      $this: Compra, 
+            //      $modelInstance: Usuario, 
+            //      relation: user, 
+            //      $modelInstance->getPrimaryKey()[0]: 'idusuario',
+            //      $this->attributes[$modelInstance->getPrimaryKey()[0]]: <ID del usuario en Compra X>
+            //      descripcion: Busco el Usuario que tiene el idusuario igual al id del usuario en la compra actual.
+            //     */
+            //     $returnValue = $this->queryBuilder->where([$modelInstance->getPrimaryKey()[0] => $this->attributes[$modelInstance->getPrimaryKey()[0]]]);
+            // } elseif ($relationType === ModelRelations::BelongsToMany) {
+            //     /*
+            //      $this: Usuario, 
+            //      $modelInstance: Rol, 
+            //      relation: roles,
+            //      pivot: usuariorol,
+            //      $modelInstance->getPrimaryKey()[0]: 'idrol',
+            //      $this->attributes[$modelInstance->getPrimaryKey()[0]]: <ID del rol en Usuario X>
+            //      descripcion: Busco los Roles que tienen el idrol igual al id del rol en el usuario actual.
+            //     */
+
+            //     $returnValue = $this->queryBuilder->where([$primaryKeyFullName => $this->attributes[$primaryKey]]);
+            // }
+        }
+
+        return $returnValue;
+    }
+
+    private function getRelationQueryableOld(string $relationName): QueryBuilder
+    {
+        $returnValue = null;
+
+        if (array_key_exists($relationName, $this->relations)) {
+            [$relationType, $modelClass, $pivot] = $this->relations[$relationName] + [null, null, null];
+            $modelInstance = new $modelClass();
+            $queryBuilder = $modelInstance->queryBuilder;
+            $queryBuilder->select()->from();
+
+            if ($relationType === ModelRelations::HasMany) {
+                /* 
+                $this: Compra,
+                $modelInstance: CompraItem,
+                relation: items,
+                $this->getPrimaryKey()[0]: 'idcompra',
+                $this->attributes[$this->getPrimaryKey()[0]]: <ID de la compra X>
+                descripcion: Filtro los CompraItem que tienen el idcompra igual al id de la compra actual.
+                */
+                $returnValue = $queryBuilder->where([$this->getPrimaryKey()[0] => $this->attributes[$this->getPrimaryKey()[0]]]);
+            } elseif ($relationType === ModelRelations::BelongsTo) {
+                /*
+                 $this: Compra, 
+                 $modelInstance: Usuario, 
+                 relation: user, 
+                 $modelInstance->getPrimaryKey()[0]: 'idusuario',
+                 $this->attributes[$modelInstance->getPrimaryKey()[0]]: <ID del usuario en Compra X>
+                 descripcion: Busco el Usuario que tiene el idusuario igual al id del usuario en la compra actual.
+                */
+                $returnValue = $queryBuilder->where([$modelInstance->getPrimaryKey()[0] => $this->attributes[$modelInstance->getPrimaryKey()[0]]]);
+            } elseif ($relationType === ModelRelations::BelongsToMany) {
+                /*
+                 $this: Usuario, 
+                 $modelInstance: Rol, 
+                 relation: roles,
+                 pivot: usuariorol,
+                 $modelInstance->getPrimaryKey()[0]: 'idrol',
+                 $this->attributes[$modelInstance->getPrimaryKey()[0]]: <ID del rol en Usuario X>
+                 descripcion: Busco los Roles que tienen el idrol igual al id del rol en el usuario actual.
+                */
+                $returnValue = $queryBuilder->where([$modelInstance->getPrimaryKey()[0] => $this->attributes[$modelInstance->getPrimaryKey()[0]]]);
+            }
+        }
+
+        return $returnValue;
+    }
+
+    private function mapDataToObjects(array $data): array
+    {
+        $returnValue = [];
+
+        if ($data) {
+            $returnValue = array_map(fn($row) => $this->mapToObject($row), $data);;
+        }
+
+        return $returnValue;
     }
     #endregion
 }
