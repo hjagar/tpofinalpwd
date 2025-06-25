@@ -14,7 +14,7 @@ class CartController
         $cart = $this->getCart();
         return view('cart.index', ['cart' => $cart]);
     }
-    
+
 
     /**
      * Add a product to the cart.

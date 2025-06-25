@@ -2,7 +2,8 @@
 
 namespace App\Controllers;
 
-class MyPurchasesController {
+class MyPurchasesController
+{
     /**
      * Display the user's purchases.
      *

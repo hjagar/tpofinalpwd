@@ -37,7 +37,7 @@ class ProductController
         return view('admin.products.edit', compact('producto'));
     }
 
-    public function update(Request $request, int $id    )
+    public function update(Request $request, int $id)
     {
         $producto = Producto::find($id);
         if (!$producto) {
@@ -54,7 +54,7 @@ class ProductController
      * @param int $id
      * @return void
      */
-    public function delete(int $id)
+    public function destroy(int $id)
     {
         $producto = Producto::find($id);
         if (!$producto) {

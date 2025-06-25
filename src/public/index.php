@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/../../vendor/autoload.php';
 
+use App\Controllers\AdminController;
 use App\Controllers\AppController;
 use App\Controllers\AuthController;
 use App\Controllers\ContactController;
@@ -47,34 +48,35 @@ $router->get('/contact', [ContactController::class, 'index'])->name('contact.ind
 $router->post('/contact', [ContactController::class, 'store'])->name('contact.store');
 
 // Rutas de administración
+$router->get('/admin', [AdminController::class, 'index'])->name('admin.index');
 // Rutas de administración de menus
 $router->get('/admin/menus', [MenuController::class, 'index'])->name('admin.menus.index');
 $router->get('/admin/menus/create', [MenuController::class, 'create'])->name('admin.menus.create');
 $router->post('/admin/menus', [MenuController::class, 'store'])->name('admin.menus.store');
 $router->get('/admin/menus/{id}/edit', [MenuController::class, 'edit'])->name('admin.menus.edit');
 $router->post('/admin/menus/{id}', [MenuController::class, 'update'])->name('admin.menus.update');
-$router->post('/admin/menus/{id}/delete', [MenuController::class, 'delete'])->name('admin.menus.delete');
+$router->post('/admin/menus/{id}/delete', [MenuController::class, 'destroy'])->name('admin.menus.destroy');
 // Rutas de administración de roles
 $router->get('/admin/roles', [RoleController::class, 'index'])->name('admin.roles.index');
 $router->get('/admin/roles/create', [RoleController::class, 'create'])->name('admin.roles.create');
 $router->post('/admin/roles', [RoleController::class, 'store'])->name('admin.roles.store');
 $router->get('/admin/roles/{id}/edit', [RoleController::class, 'edit'])->name('admin.roles.edit');
 $router->post('/admin/roles/{id}', [RoleController::class, 'update'])->name('admin.roles.update');
-$router->post('/admin/roles/{id}/delete', [RoleController::class, 'delete'])->name('admin.roles.delete');
+$router->post('/admin/roles/{id}/delete', [RoleController::class, 'destroy'])->name('admin.roles.destroy');
 // Rutas de administración de usuarios
 $router->get('/admin/users', [UserController::class, 'index'])->name('admin.users.index');
 $router->get('/admin/users/create', [UserController::class, 'create'])->name('admin.users.create');
 $router->post('/admin/users', [UserController::class, 'store'])->name('admin.users.store');
 $router->get('/admin/users/{id}/edit', [UserController::class, 'edit'])->name('admin.users.edit');
 $router->post('/admin/users/{id}', [UserController::class, 'update'])->name('admin.users.update');
-$router->post('/admin/users/{id}/delete', [UserController::class, 'delete'])->name('admin.users.delete');
+$router->post('/admin/users/{id}/delete', [UserController::class, 'destroy'])->name('admin.users.destroy');
 // Rutas de administración de productos
 $router->get('/admin/products', [ProductController::class, 'index'])->name('admin.products.index');
 $router->get('/admin/products/create', [ProductController::class, 'create'])->name('admin.products.create');
 $router->post('/admin/products', [ProductController::class, 'store'])->name('admin.products.store');
 $router->get('/admin/products/{id}/edit', [ProductController::class, 'edit'])->name('admin.products.edit');
 $router->post('/admin/products/{id}', [ProductController::class, 'update'])->name('admin.products.update');
-$router->post('/admin/products/{id}/delete', [ProductController::class, 'delete'])->name('admin.products.delete');
+$router->post('/admin/products/{id}/delete', [ProductController::class, 'destroy'])->name('admin.products.destroy');
 
 $app = Application::configure(dirname(__DIR__), $router)
     ->withAppController(AppController::class)->build();

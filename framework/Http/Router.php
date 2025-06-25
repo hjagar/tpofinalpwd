@@ -75,7 +75,7 @@ class Router
     {
         $returnValue = null;
         $routes = $this->routes[strtoupper($method)];
-        $route = array_find($routes, fn($ro) => $ro->uri === $uri);
+        $route = array_find($routes, fn($ro) => preg_match($ro->regex, $uri, $matches));
 
         if ($route !== null) {
             $returnValue = $route;
@@ -84,14 +84,14 @@ class Router
         return $returnValue;
     }
 
-    public function findRouteByName($routeName): string
+    public function findRouteByName($routeName): ?Route
     {
-        $returnValue = "";
+        $returnValue = null;
         $routes = [...$this->routes['GET'], ...$this->routes['POST']];
         $route = array_find($routes, fn($ro) => $ro->routeName === $routeName);
 
         if ($route !== null) {
-            $returnValue = $route->uri;
+            $returnValue = $route;
         }
 
         return $returnValue;

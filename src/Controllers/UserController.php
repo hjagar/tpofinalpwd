@@ -15,7 +15,7 @@ class UserController
 
     public function create()
     {
-        return view('admin.users.create');  
+        return view('admin.users.create');
     }
 
     public function store(Request $request)
@@ -30,33 +30,33 @@ class UserController
 
     public function edit(int $id)
     {
-        $user = Usuario::find($id);
-        if (!$user) {
+        $usuario = Usuario::find($id);
+        if (!$usuario) {
             abort(404, 'User not found');
         }
 
-        return view('admin.users.edit', compact('user'));
+        return view('admin.users.edit', compact('usuario'));
     }
 
     public function update(Request $request, int $id)
     {
-        $user = Usuario::find($id);
-        if (!$user) {
+        $usuario = Usuario::find($id);
+        if (!$usuario) {
             abort(404, 'User not found');
         }
-        $user->fill($request->all());
-        $user->save();
+        $usuario->fill($request->all());
+        $usuario->save();
 
         redirect('admin.users.index');
     }
 
-    public function delete(int $id)
+    public function destroy(int $id)
     {
-        $user = Usuario::find($id);
-        if (!$user) {
+        $usuario = Usuario::find($id);
+        if (!$usuario) {
             abort(404, 'User not found');
         }
-        $user->delete();
+        $usuario->delete();
 
         redirect('admin.users.index');
     }

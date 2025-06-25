@@ -28,17 +28,18 @@ class Application
         static::$instance = $this;
     }
 
-    private function boot() {
+    private function boot()
+    {
         if ($this->appController !== null) {
             $this->appController->boot();
         }
     }
 
-    public function __get($name) {
-        if(property_exists($this, $name)) {
+    public function __get($name)
+    {
+        if (property_exists($this, $name)) {
             return $this->$name;
-        }
-        else{
+        } else {
             throw new Exception("La propiedad {$name} no existe");
         }
     }
@@ -55,7 +56,8 @@ class Application
         $this->kernel = $kernel;
     }
 
-    public function setAppController($appControllerClass) {
+    public function setAppController($appControllerClass)
+    {
         if (class_exists($appControllerClass)) {
             $this->appController = new $appControllerClass();
         }
@@ -88,9 +90,33 @@ class Application
         return static::$instance;
     }
 
-    public function getRoute($routeName, $parameters=[]) {
-        $routeUrl = $this->kernel->router->findRouteByName($routeName);
+    public function getRoute($routeName, $parameters = [])
+    {
+        $route = $this->kernel->router->findRouteByName($routeName);
+        $paramNames = $route?->paramNames ?? [];
+        $namedParameters = array_combine($paramNames, $parameters);
+        $routeTemplate = $this->regexToTemplate($route?->regex ?? '');
+        $routeUrl = $this->fillTemplate($routeTemplate, $namedParameters) ?? '';
 
-        return $routeUrl; //? $route->uri : null;
+        return $routeUrl;
+    }
+
+    private function regexToTemplate(string $regex): string
+    {
+        $pattern = trim($regex, "#^$");
+        $pattern = preg_replace_callback('/\(\?<(?<name>\w+)>[^)]+\)/', function ($match) {
+            return '{' . $match['name'] . '}';
+        }, $pattern);
+
+        return $pattern;
+    }
+
+    private function fillTemplate(string $template, array $params): string
+    {
+        foreach ($params as $key => $value) {
+            $template = str_replace("{" . $key . "}", urlencode($value), $template);
+        }
+
+        return $template;
     }
 }

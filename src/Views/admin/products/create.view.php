@@ -23,6 +23,6 @@
       <input type="number" class="form-control" id="stock" name="stock" required>
     </div>
     <button type="submit" class="btn btn-primary">Crear Producto</button>
-    <a href="{{ route('admin.products.index') }}" class="btn btn-secondary mt-3">Volver a Productos</a>
+    <a href="{{ route('admin.products.index') }}" class="btn btn-secondary">Volver a Productos</a>
   </form>
 @endsection

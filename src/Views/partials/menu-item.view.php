@@ -1,5 +1,5 @@
 <li>
-    <a href="{{ route($item->url) ?: '#NotImplemented#' }}">{{ $item->nombre }}</a>
+    <a href="{{ route($item->route_name) ?: '#NotImplemented#' }}">{{ $item->nombre }}</a>
 
     @if($item->isPropertySet('children'))
         <ul>

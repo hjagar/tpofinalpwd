@@ -1,16 +1,20 @@
 <?php
+
 namespace App\Controllers;
 
 use App\Enums\Roles;
 use PhpMvc\Framework\Http\Request;
 use App\Models\Usuario;
 
-class AuthController {
-    public function index() {
+class AuthController
+{
+    public function index()
+    {
         return view('auth.login');
     }
 
-    public function login(Request $request) {
+    public function login(Request $request)
+    {
         $email = $request->usmail;
         $password = $request->uspass;
 
@@ -28,7 +32,8 @@ class AuthController {
         }
     }
 
-    public function logout() {
+    public function logout()
+    {
         unset($_SESSION['user']);
         redirect('home.index');
     }

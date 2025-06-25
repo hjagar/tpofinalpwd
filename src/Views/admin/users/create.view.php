@@ -19,6 +19,6 @@
       <input type="password" class="form-control" id="password" name="password" required>
     </div>
     <button type="submit" class="btn btn-primary">Crear Usuario</button>
-    <a href="{{ route('admin.users.index') }}" class="btn btn-secondary mt-3">Volver a Usuarios</a>
+    <a href="{{ route('admin.users.index') }}" class="btn btn-secondary">Volver a Usuarios</a>
   </form>
 @endsection

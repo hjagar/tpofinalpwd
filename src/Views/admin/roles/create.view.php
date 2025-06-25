@@ -11,6 +11,6 @@
       <input type="text" class="form-control" id="nombre" name="nombre" required>
     </div>
     <button type="submit" class="btn btn-primary">Crear Rol</button>
-    <a href="{{ route('admin.roles.index') }}" class="btn btn-secondary mt-3">Volver a Roles</a>
+    <a href="{{ route('admin.roles.index') }}" class="btn btn-secondary">Volver a Roles</a>
   </form>
 @endsection

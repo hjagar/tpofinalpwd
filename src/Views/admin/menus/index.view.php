@@ -14,7 +14,7 @@ Menús
                 <th>Nombre</th>
                 <th>Descripción</th>
                 <th>Padre</th>
-                <th>URL</th>
+                <th>Nombre de Ruta</th>
                 <th>Html Id</th>
                 <th>Necesita Usuario</th>
                 <th>Acciones</th>
@@ -27,7 +27,7 @@ Menús
                 <td>{{ $menu->nombre }}</td>
                 <td>{{ $menu->descripcion }}</td>
                 <td>{{ $menu->idpadre ?? 'Ninguno' }}</td>
-                <td>{{ $menu->url ?? '' }}</td>
+                <td>{{ $menu->route_name ?? '' }}</td>
                 <td>{{ $menu->html_id ?? '' }}</td>
                 <td>{{ $menu->has_user ? 'Sí' : 'No' }}</td>
                 <td>

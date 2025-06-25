@@ -4,7 +4,7 @@
 @endsection
 @section('content')
   <h1>Actualizar Menú</h1>
-  <form action="{{ route('admin.menus.update', $menu->idmenu) }}" method="POST">
+  <form action="{{ route('admin.menus.update', [$menu->idmenu]) }}" method="POST">
     @csrf
     <div class="form-group">
       <label for="nombre">Nombre</label>
@@ -27,12 +27,12 @@
       </select>
     </div>
     <div class="form-group">
-      <label for="url">URL</label>
-      <input type="text" class="form-control" id="url" name="url" value="{{ $menu->url }}">
+      <label for="route_name">Nombre de Ruta</label>
+      <input type="text" class="form-control" id="route_name" name="route_name" value="{{ $menu->route_name ?? '' }}">
     </div>
     <div class="form-group">
       <label for="html_id">HTML ID</label>
-      <input type="text" class="form-control" id="html_id" name="html_id" value="{{ $menu->html_id }}">
+      <input type="text" class="form-control" id="html_id" name="html_id" value="{{ $menu->html_id ?? '' }}">
     </div>
     <div class="form-group">
       <label for="has_user">Necesita Usuario</label>

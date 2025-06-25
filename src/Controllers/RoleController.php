@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Controllers;
 
 use App\Models\Rol;
@@ -51,8 +52,8 @@ class RoleController
      *
      * @param int $id
      * @return void
-     */ 
-    public function delete(int $id)
+     */
+    public function destroy(int $id)
     {
         $role = Rol::find($id);
         if (!$role) {

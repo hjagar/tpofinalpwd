@@ -52,7 +52,7 @@ class MenuController
         redirect('admin.menus.index');
     }
 
-    public function delete(int $id)
+    public function destroy(int $id)
     {
         $menu = Menu::find($id);
         if (!$menu) {

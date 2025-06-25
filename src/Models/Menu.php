@@ -25,7 +25,7 @@ class Menu extends Model
                 FROM menu m
                 INNER JOIN menu_recursivo mr ON m.idpadre = mr.idmenu
             )
-            SELECT mr1.idmenu, mr1.nombre, mr1.idpadre, mr1.url, mr1.html_id, mr1.has_user, GROUP_CONCAT(mr2.idrol) AS role_ids,
+            SELECT mr1.idmenu, mr1.nombre, mr1.idpadre, mr1.route_name, mr1.html_id, mr1.has_user, GROUP_CONCAT(mr2.idrol) AS role_ids,
                 GROUP_CONCAT(r.nombre) AS role_names
             FROM menu_recursivo AS mr1
                 INNER JOIN menurol AS mr2
@@ -33,7 +33,7 @@ class Menu extends Model
                 INNER JOIN rol AS r
                     ON mr2.idrol = r.idrol
             WHERE mr1.nombre <> ?
-            GROUP BY mr1.idmenu, mr1.nombre, mr1.idpadre, mr1.url, mr1.html_id, mr1.has_user;";
+            GROUP BY mr1.idmenu, mr1.nombre, mr1.idpadre, mr1.route_name, mr1.html_id, mr1.has_user;";
 
         return $sql;
     }

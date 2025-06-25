@@ -4,9 +4,8 @@
 @endsection
 @section('content')
   <h1>Actualizar Producto</h1>
-  <form action="{{ route('admin.products.update', $producto->idproducto) }}" method="POST">
+  <form action="{{ route('admin.products.update', [$producto->idproducto]) }}" method="POST">
     @csrf
-    @method('PUT')
     <div class="form-group">
       <label for="nombre">Nombre</label>
       <input type="text" class="form-control" id="nombre" name="nombre" value="{{ $producto->nombre }}" required>
@@ -22,10 +21,10 @@
     </div>
     <div class="form-group">
       <label for="stock">Cantidad en Stock</label>
-      <input type="number" class="form-control" id="stock" name="stock" value="{{ $producto->prcantstock }}"
+      <input type="number" class="form-control" id="stock" name="stock" value="{{ $producto->stock }}"
         required>
     </div>
     <button type="submit" class="btn btn-primary">Actualizar Producto</button>
-    <a href="{{ route('admin.products.index') }}" class="btn btn-secondary mt-3">Volver a Productos</a>
+    <a href="{{ route('admin.products.index') }}" class="btn btn-secondary">Volver a Productos</a>
   </form>
 @endsection

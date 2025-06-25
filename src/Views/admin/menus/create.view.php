@@ -24,8 +24,8 @@
       </select>
     </div>
     <div class="form-group">
-      <label for="url">URL</label>
-      <input type="text" class="form-control" id="url" name="url">
+      <label for="route_name">Nombre de Ruta</label>
+      <input type="text" class="form-control" id="route_name" name="route_name">
     </div>
     <div class="form-group">
       <label for="html_id">HTML ID</label>
@@ -39,7 +39,6 @@
       </select>
     </div>
     <button type="submit" class="btn btn-primary">Crear Menú</button>
-    <a href="{{ route('admin.menus.index') }}" class="btn btn-secondary mt-3">Volver a Menús</a>
+    <a href="{{ route('admin.menus.index') }}" class="btn btn-secondary">Volver a Menús</a>
   </form>
-  
 @endsection
