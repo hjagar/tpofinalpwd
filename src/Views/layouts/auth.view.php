@@ -8,6 +8,7 @@
         @yield('content')
     </main>
     @include('partials.footer')
+    @yield('javascript')
 </body>
 
 </html>

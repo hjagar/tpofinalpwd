@@ -5,10 +5,15 @@ Menús
 @endsection
 
 @section('content')
-    <h1>Menús</h1>
-    <a href="{{ route('admin.menus.create') }}" class="btn btn-primary mb-3">Crear Menú</a>
-    <table class="table">
-        <thead>
+<h1 class="mb-4 text-center">Menús</h1>
+<div class="mb-3 text-end">
+    <a href="{{ route('admin.menus.create') }}" class="btn btn-primary btn-sm">
+        Crear
+    </a>
+</div>
+<div class="table-responsive">
+    <table class="table table-striped table-hover align-middle">
+        <thead class="table-dark">
             <tr>
                 <th>Id</th>
                 <th>Nombre</th>
@@ -21,7 +26,7 @@ Menús
             </tr>
         </thead>
         <tbody>
-        @foreach($menus as $menu)
+            @foreach($menus as $menu)
             <tr>
                 <td>{{ $menu->idmenu }}</td>
                 <td>{{ $menu->nombre }}</td>
@@ -29,16 +34,21 @@ Menús
                 <td>{{ $menu->idpadre ?? 'Ninguno' }}</td>
                 <td>{{ $menu->route_name ?? '' }}</td>
                 <td>{{ $menu->html_id ?? '' }}</td>
-                <td>{{ $menu->has_user ? 'Sí' : 'No' }}</td>
                 <td>
-                    <a href="{{ route('admin.menus.edit', [$menu->idmenu]) }}" class="btn btn-warning">Editar</a>
-                    <form action="{{ route('admin.menus.destroy', [$menu->idmenu]) }}" method="POST" style="display:inline;">
+                    <span class="badge {{ $menu->has_user ? 'bg-success' : 'bg-secondary' }}">
+                        {{ $menu->has_user ? 'Sí' : 'No' }}
+                    </span>
+                </td>
+                <td>
+                    <a href="{{ route('admin.menus.edit', [$menu->idmenu]) }}" class="btn btn-warning btn-sm me-1">Editar</a>
+                    <form action="{{ route('admin.menus.destroy', [$menu->idmenu]) }}" method="POST" class="d-inline">
                         @csrf
-                        <button type="submit" class="btn btn-danger">Eliminar</button>
+                        <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('¿Seguro que desea eliminar este menú?')">Eliminar</button>
                     </form>
                 </td>
             </tr>
-        @endforeach
+            @endforeach
         </tbody>
     </table>
+</div>
 @endsection

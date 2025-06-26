@@ -15,6 +15,7 @@ use App\Controllers\CartController;
 use App\Controllers\MenuController;
 use App\Controllers\ProductController;
 use App\Controllers\RoleController;
+use App\Controllers\SalesController;
 use App\Controllers\UserController;
 use PhpMvc\Framework\Core\Application;
 use PhpMvc\Framework\Http\Router;
@@ -77,6 +78,9 @@ $router->post('/admin/products', [ProductController::class, 'store'])->name('adm
 $router->get('/admin/products/{id}/edit', [ProductController::class, 'edit'])->name('admin.products.edit');
 $router->post('/admin/products/{id}', [ProductController::class, 'update'])->name('admin.products.update');
 $router->post('/admin/products/{id}/delete', [ProductController::class, 'destroy'])->name('admin.products.destroy');
+// Rutas de ventas
+$router->get('/admin/sales', [SalesController::class, 'index'])->name('admin.sales.index');
+$router->get('/admin/sales/{id}/edit', [SalesController::class, 'edit'])->name('admin.sales.edit');
 
 $app = Application::configure(dirname(__DIR__), $router)
     ->withAppController(AppController::class)->build();

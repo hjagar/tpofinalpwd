@@ -7,6 +7,15 @@ use PhpMvc\Framework\Data\Constants\ModelRelations;
 
 class Menu extends Model
 {
+    protected array $fillable = [
+        'nombre',
+        'descripcion',
+        'idpadre',
+        'route_name',
+        'html_id',
+        'has_user'
+    ];
+
     protected array $relations = [
         'roles' => [ModelRelations::BelongsToMany, Rol::class, 'menurol'],
         'submenus' => [ModelRelations::HasMany, Menu::class, 'idmenu', 'idpadre'],
