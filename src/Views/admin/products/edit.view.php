@@ -28,9 +28,9 @@
               <input type="number" class="form-control" id="stock" name="stock" value="{{ $producto->stock }}"
                 required>
             </div>
-            <div class="d-flex justify-content-between">
-              <button type="submit" class="btn btn-primary">Actualizar Producto</button>
-              <a href="{{ route('admin.products.index') }}" class="btn btn-secondary">Volver a Productos</a>
+            <div class="d-flex justify-content-start gap-2">
+              <button type="submit" class="btn btn-primary">Actualizar</button>
+              <a href="{{ route('admin.products.index') }}" class="btn btn-secondary">Cancelar</a>
             </div>
           </form>
         </div>

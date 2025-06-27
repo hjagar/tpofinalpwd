@@ -42,9 +42,9 @@
                 <option value="1">Sí</option>
               </select>
             </div>
-            <div class="d-flex justify-content-between">
-              <button type="submit" class="btn btn-primary">Crear Menú</button>
-              <a href="{{ route('admin.menus.index') }}" class="btn btn-secondary">Volver</a>
+            <div class="d-flex justify-content-start gap-2">
+              <button type="submit" class="btn btn-primary">Guardar</button>
+              <a href="{{ route('admin.menus.index') }}" class="btn btn-secondary">Cancelar</a>
             </div>
           </form>
         </div>

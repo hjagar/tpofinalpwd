@@ -15,15 +15,15 @@ class AuthController
 
     public function login(Request $request)
     {
-        $email = $request->usmail;
-        $password = $request->uspass;
+        $email = $request->email;
+        $password = $request->password;
 
-        $usuario = Usuario::where(['usmail' => $email])->first();
+        $usuario = Usuario::where(['email' => $email])->first();
 
-        if ($usuario && password_verify($password, $usuario->uspass)) {
+        if ($usuario && password_verify($password, $usuario->password)) {
             $_SESSION['user'] = [
                 'id' => $usuario->idusuario,
-                'name' => $usuario->usnombre,
+                'name' => $usuario->nombre,
                 'roles' => [Roles::CLIENTE]
             ];
             redirect('home.index');

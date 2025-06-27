@@ -22,9 +22,9 @@
               <label for="password" class="form-label">Contraseña</label>
               <input type="password" class="form-control" id="password" name="password">
             </div>
-            <div class="d-flex justify-content-between">
-              <button type="submit" class="btn btn-primary">Actualizar Usuario</button>
-              <a href="{{ route('admin.users.index') }}" class="btn btn-secondary">Volver a Usuarios</a>
+            <div class="d-flex justify-content-start gap-2">
+              <button type="submit" class="btn btn-primary">Actualizar</button>
+              <a href="{{ route('admin.users.index') }}" class="btn btn-secondary">Cancelar</a>
             </div>
           </form>
         </div>

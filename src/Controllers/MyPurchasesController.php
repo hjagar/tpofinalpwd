@@ -13,20 +13,41 @@ class MyPurchasesController
     {
         // Aquí se obtendrían las compras del usuario autenticado
         // Por ejemplo, usando un modelo de compra
-        $purchases = $this->getUserPurchases();
+        $compras = [
+            (object)[
+                'idcompra' => 1,
+                'customer' => 'Juan Pérez',
+                'fecha' => '2024-06-01',
+                'total' => 1500.00,
+                'product' => 'Notebook Lenovo',
+                'status' => 'Completada'
+            ]
+        ];
 
-        return view('my_purchases.index', ['purchases' => $purchases]);
+        return view('my_purchases.index', compact('compras'));
     }
 
     /**
-     * Get the purchases of the authenticated user.
+     * Display the details of a specific purchase.
      *
-     * @return array
+     * @param int $id
+     * @return void
      */
-    private function getUserPurchases()
+    public function show($id)
     {
-        // Lógica para obtener las compras del usuario autenticado
-        // Esto podría ser una consulta a la base de datos
-        return [];
+        $purchase = (object)[
+            'idcompra' => 1,
+            'customer' => 'Juan Pérez',
+            'fecha' => '2024-06-01',
+            'total' => 1500.00,
+            'product' => 'Notebook Lenovo',
+            'status' => 'Completada'
+        ]; // Obtener la compra por ID
+
+        if (!$purchase) {
+            return redirect('my_purchases.index')->with('error', 'Compra no encontrada.');
+        }
+
+        return view('my_purchases.show', compact('purchase'));
     }
 }

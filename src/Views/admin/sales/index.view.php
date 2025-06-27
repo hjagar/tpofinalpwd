@@ -21,21 +21,21 @@
         <tbody>
           @foreach ($sales as $venta)
             <tr>
-              <td>{{ $venta['id'] }}</td>
-              <td>{{ $venta['product'] }}</td>
-              <td>{{ $venta['quantity'] ?? 1 }}</td>
-              <td>${{ number_format($venta['total'], 2) }}</td>
-              <td>{{ $venta['customer'] }}</td>
+              <td>{{ $venta->id }}</td>
+              <td>{{ $venta->product }}</td>
+                <td>{{ $venta->quantity ?? 1 }}</td>
+                <td class="text-end"><div class="pe-5">${{ number_format($venta->total, 2, ',', '.') }}</div></td>
+              <td>{{ $venta->customer }}</td>
               <td>
                 <span class="badge
-                  @if ($venta['status'] == 'Pendiente') bg-warning
-                  @elseif($venta['status'] == 'Completada') bg-success
+                  @if ($venta->status == 'Pendiente') bg-warning
+                  @elseif($venta->status == 'Completada') bg-success
                   @else bg-secondary @endif">
-                  {{ $venta['status'] }}
+                  {{ $venta->status }}
                 </span>
               </td>
               <td>
-                <a href="{{ route('admin.sales.edit', [$venta['id']]) }}" class="btn btn-primary btn-sm me-1">Editar</a>
+                <a href="{{ route('admin.sales.edit', [$venta->id]) }}" class="btn btn-warning btn-sm me-1">Editar</a>
               </td>
             </tr>
           @endforeach

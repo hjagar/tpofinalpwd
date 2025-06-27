@@ -44,8 +44,8 @@
                 <option value="1" {{ $menu->has_user ? 'selected' : '' }}>Sí</option>
               </select>
             </div>
-            <div class="d-flex justify-content-between">
-              <button type="submit" class="btn btn-primary">Actualizar Menú</button>
+            <div class="d-flex justify-content-start gap-2">
+              <button type="submit" class="btn btn-primary">Actualizar</button>
               <a href="{{ route('admin.menus.index') }}" class="btn btn-secondary">Cancelar</a>
             </div>
           </form>

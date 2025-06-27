@@ -38,6 +38,7 @@ $router->post('/register', [RegisterController::class, 'store'])->name('regiter.
 
 // Rutas de mis compras
 $router->get('/my-purchases', [MyPurchasesController::class, 'index'])->name('my_purchases.index');
+$router->get('/my-purchases/{id}/show', [MyPurchasesController::class, 'show'])->name('my_purchases.show');
 
 // Rutas del carrito
 $router->get('/cart', [CartController::class, 'index'])->name('cart.index');
@@ -81,6 +82,7 @@ $router->post('/admin/products/{id}/delete', [ProductController::class, 'destroy
 // Rutas de ventas
 $router->get('/admin/sales', [SalesController::class, 'index'])->name('admin.sales.index');
 $router->get('/admin/sales/{id}/edit', [SalesController::class, 'edit'])->name('admin.sales.edit');
+$router->post('/admin/sales/{id}', [SalesController::class, 'update'])->name('admin.sales.update');
 
 $app = Application::configure(dirname(__DIR__), $router)
     ->withAppController(AppController::class)->build();

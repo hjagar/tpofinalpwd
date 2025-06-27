@@ -12,7 +12,7 @@ class CartController
     public function index()
     {
         $cart = $this->getCart();
-        return view('cart.index', ['cart' => $cart]);
+        return view('cart.index', compact('cart'));
     }
 
 
