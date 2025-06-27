@@ -7,6 +7,7 @@ use PhpMvc\Framework\Configuration\ApplicationBuilder;
 use PhpMvc\Framework\Http\Kernel;
 use PhpMvc\Framework\Http\Request;
 use PhpMvc\Framework\Http\Router;
+use PhpMvc\Framework\Security\AuthManager;
 
 class Application
 {
@@ -20,6 +21,7 @@ class Application
     private string $viewPath;
     private string $compiledViewPath;
     private $appController = null;
+    private ?AuthManager $authManager = null;
 
     public function __construct(private readonly string $basePath)
     {
@@ -63,6 +65,11 @@ class Application
         }
     }
 
+    public function setAuthManager($authManager)
+    {
+        $this->authManager = $authManager;
+    }
+
     public function getBasePath(): string
     {
         return $this->basePath;
@@ -99,6 +106,15 @@ class Application
         $routeUrl = $this->fillTemplate($routeTemplate, $namedParameters) ?? '';
 
         return $routeUrl;
+    }
+
+    public function getAuth()
+    {
+        if ($this->authManager === null) {
+            throw new Exception('Authentication service is not available.');
+        }
+        return $this->authManager;
+
     }
 
     private function regexToTemplate(string $regex): string

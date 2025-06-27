@@ -13,8 +13,10 @@ class ViewComposer
 
     public static function getShared(): array
     {
-        if (isset($_SESSION['user'])) {
-            self::$globals['user'] = $_SESSION['user'];
+        //if (isset($_SESSION['user'])) {
+        if (auth()->check()) {
+            self::$globals['user'] = auth()->user();
+            //self::$globals['user'] = $_SESSION['user'];
         }
 
         if (isset($_SESSION['flash'])) {

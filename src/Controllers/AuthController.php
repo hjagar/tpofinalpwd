@@ -2,9 +2,7 @@
 
 namespace App\Controllers;
 
-use App\Enums\Roles;
 use PhpMvc\Framework\Http\Request;
-use App\Models\Usuario;
 
 class AuthController
 {
@@ -18,14 +16,10 @@ class AuthController
         $email = $request->email;
         $password = $request->password;
 
-        $usuario = Usuario::where(['email' => $email])->first();
-
-        if ($usuario && password_verify($password, $usuario->password)) {
-            $_SESSION['user'] = [
-                'id' => $usuario->idusuario,
-                'name' => $usuario->nombre,
-                'roles' => [Roles::CLIENTE]
-            ];
+        if (auth()->attempt($email, $password)) {
+            $usuario = auth()->getDbUser('idusuario');
+            $roles = $usuario->roles()->get();
+            auth()->user()->roles = array_map(fn($role) => $role->nombre, $roles);
             redirect('home.index');
         } else {
             return view('auth.login', ['error' => 'Credenciales inválidas']);
@@ -34,7 +28,7 @@ class AuthController
 
     public function logout()
     {
-        unset($_SESSION['user']);
+        auth()->logout();
         redirect('home.index');
     }
 }
