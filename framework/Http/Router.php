@@ -2,6 +2,8 @@
 
 namespace PhpMvc\Framework\Http;
 
+use Exception;
+
 class Router
 {
     private $routes = [
@@ -11,25 +13,23 @@ class Router
 
     public function __construct() {}
 
+    public function __get($name)
+    {
+        if (property_exists($this, $name)) {
+            return $this->$name;
+        } else {
+            throw new Exception("La propiedad {$name} no existe");
+        }
+    }
+
     public function get($uri, $action)
     {
-        $this->addRoute('GET', $uri, $action);
+        return $this->addRoute('GET', $uri, $action);
     }
 
     public function post($uri, $action)
     {
-        $this->addRoute('POST', $uri, $action);
-    }
-
-    private function addRoute($method, $uri, $action)
-    {
-        [$regex, $paramNames] = $this->convertToRegex($uri);
-        $this->routes[$method][] = [
-            'regex' => $regex,
-            'paramNames' => $paramNames,
-            'action' => $action,
-            'original' => $uri,
-        ];
+        return $this->addRoute('POST', $uri, $action);
     }
 
     public function dispatch($uri, $method, ?Request $request = null)
@@ -38,15 +38,16 @@ class Router
         $method = strtoupper($method);
 
         foreach ($this->routes[$method] as $route) {
-            if (preg_match($route['regex'], $path, $matches)) {
+            if (preg_match($route->regex, $path, $matches)) {
                 $params = [];
-                foreach ($route['paramNames'] as $name) {
+
+                foreach ($route->paramNames as $name) {
                     if (isset($matches[$name])) {
                         $params[$name] = $matches[$name];
                     }
                 }
 
-                $action = $route['action'];
+                $action = $route->action;
 
                 // Si es POST, agrega el Request como primer parámetro
                 if ($method === HttpMethods::POST->value && $request !== null) {
@@ -68,6 +69,41 @@ class Router
         http_response_code(404);
         echo "404 - Ruta no encontrada";
         return null;
+    }
+
+    public function match(string $uri, string $method): ?Route
+    {
+        $returnValue = null;
+        $routes = $this->routes[strtoupper($method)];
+        $route = array_find($routes, fn($ro) => preg_match($ro->regex, $uri, $matches));
+
+        if ($route !== null) {
+            $returnValue = $route;
+        }
+
+        return $returnValue;
+    }
+
+    public function findRouteByName($routeName): ?Route
+    {
+        $returnValue = null;
+        $routes = [...$this->routes['GET'], ...$this->routes['POST']];
+        $route = array_find($routes, fn($ro) => $ro->routeName === $routeName);
+
+        if ($route !== null) {
+            $returnValue = $route;
+        }
+
+        return $returnValue;
+    }
+
+    private function addRoute($method, $uri, $action)
+    {
+        [$regex, $paramNames] = $this->convertToRegex($uri);
+        $route = new Route($regex, $paramNames, $action, $uri);
+        $this->routes[$method][] = $route;
+
+        return $route;
     }
 
     private function normalize($uri)

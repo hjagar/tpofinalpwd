@@ -67,12 +67,17 @@ class Compiler
 
             $returnValue = "";
 
-            if ($replace) {
-                $returnValue = str_replace('expr', $replace, $replacements[$directive]);
-            } else {
-                $returnValue = str_replace("@{$directive}", $replace, $replacements[$directive]);
+            if (isset($replacements[$directive])) {
+                if ($replace) {
+                    $returnValue = str_replace('expr', $replace, $replacements[$directive]);
+                } else {
+                    $returnValue = str_replace("@{$directive}", $replace, $replacements[$directive]);
+                }
             }
-
+            else {
+                $returnValue = "@{$directive}";
+            }
+            
             return $returnValue;
         }, $value);
 

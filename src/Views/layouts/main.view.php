@@ -1,8 +1,19 @@
 <html>
-    <head>
-        <title>@yield('title')</title>
-    </head>
-    <body>
+
+@include('partials.head')
+
+<body>
+    <header>
+        @include('partials.logo')
+        @include('partials.search')
+        @include('partials.header-menu')
+    </header>
+    @include('partials.main-menu')
+    <main>
         @yield('content')
-    </body>
+    </main>
+    @include('partials.footer')
+    @yield('javascript')
+</body>
+
 </html>

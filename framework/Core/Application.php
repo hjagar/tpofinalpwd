@@ -2,6 +2,7 @@
 
 namespace PhpMvc\Framework\Core;
 
+use Exception;
 use PhpMvc\Framework\Configuration\ApplicationBuilder;
 use PhpMvc\Framework\Http\Kernel;
 use PhpMvc\Framework\Http\Request;
@@ -18,6 +19,7 @@ class Application
     private Kernel $kernel;
     private string $viewPath;
     private string $compiledViewPath;
+    private $appController = null;
 
     public function __construct(private readonly string $basePath)
     {
@@ -26,8 +28,25 @@ class Application
         static::$instance = $this;
     }
 
+    private function boot()
+    {
+        if ($this->appController !== null) {
+            $this->appController->boot();
+        }
+    }
+
+    public function __get($name)
+    {
+        if (property_exists($this, $name)) {
+            return $this->$name;
+        } else {
+            throw new Exception("La propiedad {$name} no existe");
+        }
+    }
+
     public function run()
     {
+        $this->boot();
         $response = $this->kernel->handle(Request::createFromGlobals());
         $response->send();
     }
@@ -35,6 +54,13 @@ class Application
     public function setKernel(Kernel $kernel): void
     {
         $this->kernel = $kernel;
+    }
+
+    public function setAppController($appControllerClass)
+    {
+        if (class_exists($appControllerClass)) {
+            $this->appController = new $appControllerClass();
+        }
     }
 
     public function getBasePath(): string
@@ -62,5 +88,35 @@ class Application
     public static function getInstance(): Application
     {
         return static::$instance;
+    }
+
+    public function getRoute($routeName, $parameters = [])
+    {
+        $route = $this->kernel->router->findRouteByName($routeName);
+        $paramNames = $route?->paramNames ?? [];
+        $namedParameters = array_combine($paramNames, $parameters);
+        $routeTemplate = $this->regexToTemplate($route?->regex ?? '');
+        $routeUrl = $this->fillTemplate($routeTemplate, $namedParameters) ?? '';
+
+        return $routeUrl;
+    }
+
+    private function regexToTemplate(string $regex): string
+    {
+        $pattern = trim($regex, "#^$");
+        $pattern = preg_replace_callback('/\(\?<(?<name>\w+)>[^)]+\)/', function ($match) {
+            return '{' . $match['name'] . '}';
+        }, $pattern);
+
+        return $pattern;
+    }
+
+    private function fillTemplate(string $template, array $params): string
+    {
+        foreach ($params as $key => $value) {
+            $template = str_replace("{" . $key . "}", urlencode($value), $template);
+        }
+
+        return $template;
     }
 }
