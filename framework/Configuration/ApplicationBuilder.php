@@ -5,6 +5,7 @@ namespace PhpMvc\Framework\Configuration;
 use PhpMvc\Framework\Core\Application;
 use PhpMvc\Framework\Http\Kernel;
 use PhpMvc\Framework\Http\Router;
+use PhpMvc\Framework\Security\AuthManager;
 
 class ApplicationBuilder
 {
@@ -35,6 +36,12 @@ class ApplicationBuilder
     public function withAppController($class): ApplicationBuilder
     {
         $this->app->setAppController($class);
+        return $this;
+    }
+
+    public function withAuthManager($userClass): ApplicationBuilder
+    {
+        $this->app->setAuthManager(new AuthManager($this->app, $userClass));
         return $this;
     }
 }

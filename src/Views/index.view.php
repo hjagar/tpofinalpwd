@@ -7,6 +7,15 @@ Tienda Tuya
 @section('content')
 <section class="productos">
     <h2>Productos</h2>
+    @role('Administrador')
+    Se puede ver esto con el rol Administrador<br />
+    @endrole
+    @role('Cliente')
+    Se puede ver esto con el rol Cliente<br />
+    @endrole
+    @role('Administrador,Cliente')
+    Se puede ver esto con los roles Administrador o Cliente<br />
+    @endrole
     <div class="grid-productos">
         @foreach($productos as $producto)
         <article class="producto">

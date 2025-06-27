@@ -17,10 +17,10 @@ use App\Controllers\ProductController;
 use App\Controllers\RoleController;
 use App\Controllers\SalesController;
 use App\Controllers\UserController;
+use App\Models\Usuario;
 use PhpMvc\Framework\Core\Application;
 use PhpMvc\Framework\Http\Router;
 
-// TODO: Crear el objecto Router
 $router = new Router();
 
 // Rutas del Inicio
@@ -85,5 +85,7 @@ $router->get('/admin/sales/{id}/edit', [SalesController::class, 'edit'])->name('
 $router->post('/admin/sales/{id}', [SalesController::class, 'update'])->name('admin.sales.update');
 
 $app = Application::configure(dirname(__DIR__), $router)
-    ->withAppController(AppController::class)->build();
+    ->withAppController(AppController::class)
+    ->withAuthManager(Usuario::class)
+    ->build();
 $app->run();

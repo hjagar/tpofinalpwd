@@ -37,12 +37,42 @@ if (!function_exists('view')) {
 }
 
 if (!function_exists('auth')) {
-    function auth() {}
+    function auth()
+    {
+        $auth = app()->getAuth();
+        if (!$auth) {
+            throw new \RuntimeException('Authentication service is not available.');
+        }
+        return $auth;
+    }
 }
 
 if (!function_exists('role')) {
-    function role(string $role) {
-        return true; // Placeholder for role checking logic
+    function role(string $roles): bool
+    {
+        $returnValue = true;
+
+        if (is_string($roles)) {
+            $roles = explode(',', $roles);
+        } elseif (!is_array($roles)) {
+            throw new \InvalidArgumentException('Roles must be a string or an array.');
+        }
+
+        if (empty($roles)) {
+            throw new \InvalidArgumentException('Roles cannot be empty.');
+        }
+
+        if (!auth()->check()) {
+            $returnValue = false; // User is not authenticated
+        }
+        
+        $roleIntersect = array_intersect(auth()->user()->roles, $roles);
+
+        if (empty($roleIntersect)) {
+            $returnValue = false; // No matching roles found
+        }
+
+        return $returnValue; // Placeholder for role checking logic
     }
 }
 
@@ -54,14 +84,15 @@ if (!function_exists('view_echo')) {
 }
 
 if (!function_exists('route')) {
-    function route($routeName, $parameters=[])
+    function route($routeName, $parameters = [])
     {
         return app()->getRoute($routeName, $parameters);
     }
 }
 
 if (!function_exists('sessionStarted')) {
-    function sessionStarted(): bool {
+    function sessionStarted(): bool
+    {
         return session_status() === PHP_SESSION_ACTIVE;
     }
 }
@@ -75,28 +106,30 @@ if (!function_exists('generateCsrfToken')) {
     }
 }
 
-if (!function_exists('regenerateCsrfToken')){
-    function regenerateCsrfToken() {
+if (!function_exists('regenerateCsrfToken')) {
+    function regenerateCsrfToken()
+    {
         unset($_SESSION['csrf_token']);
         generateCsrfToken();
     }
 }
 
 if (!function_exists('csrf')) {
-    function csrf() {
+    function csrf()
+    {
         $returnValue = "";
 
-        if(sessionStarted()){
+        if (sessionStarted()) {
             $csrfToken = $_SESSION['csrf_token'];
             $returnValue = "<input type=\"hidden\" id=\"csrf_token\" name=\"csrf_token\" value=\"{$csrfToken}\" />";
         }
-        
+
         return $returnValue;
     }
 }
 
 if (!function_exists('redirect')) {
-    function redirect(string $routeName, $parameters=[]): RedirectResponse
+    function redirect(string $routeName, $parameters = []): RedirectResponse
     {
         $url = app()->getRoute($routeName, $parameters);
         return new RedirectResponse($url);

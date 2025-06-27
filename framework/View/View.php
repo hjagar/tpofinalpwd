@@ -100,10 +100,6 @@ class View
         return "{$this->cachePath}/view-compiled-map.json";
     }
 
-    private function verifyCompiledFile(){
-
-    }
-
     private function getViewFilename(string $view): string
     {
         $viewPath = str_replace('.', '/', $view);

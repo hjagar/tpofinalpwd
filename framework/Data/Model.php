@@ -382,6 +382,16 @@ abstract class Model
             $this->$field = $fields[$field] ?? null;
         }
     }
+
+    public function getAttributes(): array
+    {
+        return $this->attributes;
+    }
+
+    public function getFields(): array
+    {
+        return array_keys($this->attributes);
+    }
     #endregion
 
     #region Private Methods
