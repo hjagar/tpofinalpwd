@@ -17,7 +17,7 @@
                     Cantidad: {{ $item->quantity }}<br>
                     Precio: ${{ number_format($item->price, 2) }}
                   </div>
-                  <form action="{{ route('cart.remove', [$item->id]) }}" method="POST">
+                  <form action="{{ route('cart.remove', [$item->id]) }}" method="POST" class="d-inline">
                     @csrf
                     <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
                   </form>
@@ -28,7 +28,7 @@
               <strong>Total: ${{ number_format($cart->sum('price'), 2) }}</strong>
             </div>
             <div class="d-flex justify-content-end mt-3">
-              <form action="{{ route('cart.checkout') }}" method="POST">
+              <form action="{{ route('cart.checkout') }}" method="POST" class="d-inline">
                 @csrf
                 <button type="submit" class="btn btn-success">Finalizar Compra</button>
               </form>

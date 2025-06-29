@@ -9,7 +9,7 @@ Editar Venta
         <div class="card shadow-sm">
             <div class="card-body">
 
-                <form action="{{ route('admin.sales.update', [$sale->id]) }}" method="POST">
+                <form action="{{ route('admin.sales.update', [$sale->id]) }}" method="POST" class="needs-validation" novalidate>
                     @csrf
                     <div class="mb-3">
                         <label for="product_id" class="form-label">Producto</label>

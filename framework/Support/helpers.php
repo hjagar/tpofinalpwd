@@ -144,3 +144,10 @@ if (!function_exists('abort')) {
         exit;
     }
 }
+
+if (!function_exists('emailPattern')) {
+    function emailPattern() {
+        $regex = '/[a-zA-Z0-9!#$%&\'*\/=?^_`\{\|\}~\+\-]([\.]?[a-zA-Z0-9!#$%&\'*\/=?^_`\{\|\}~\+\-])+@[a-zA-Z0-9]([^@&%$\/\(\)=?¿!\.,:;]|\d)+[a-zA-Z0-9][\.][a-zA-Z]{2,4}([\.][a-zA-Z]{2})?/m';
+        return "pattern=\"{$regex}\"";
+    }
+}
