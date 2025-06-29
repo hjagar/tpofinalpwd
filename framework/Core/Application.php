@@ -80,6 +80,11 @@ class Application
         return $this->viewPath;
     }
 
+    public function getAssetsBasePath(): string
+    {
+        return "{$this->basePath}/public/assets";
+    }
+
     public function getCompiledViewPath(): string
     {
         return $this->compiledViewPath;
@@ -113,8 +118,8 @@ class Application
         if ($this->authManager === null) {
             throw new Exception('Authentication service is not available.');
         }
+        
         return $this->authManager;
-
     }
 
     private function regexToTemplate(string $regex): string

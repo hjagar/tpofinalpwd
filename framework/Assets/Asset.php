@@ -1,0 +1,169 @@
+<?php
+
+namespace PhpMvc\Framework\Assets;
+
+use Exception;
+use stdClass;
+
+class Asset
+{
+    private array $attributes = [
+        'assetsBasePath' => '',
+        'origin' => AssetTypes::LOCAL
+    ];
+
+    public function __construct(string $assetBasePath, stdClass $rawAsset)
+    {
+        $this->attributes['assetsBasePath'] = $assetBasePath;
+
+        foreach ($rawAsset as $prop => $val) {
+            if ($prop === 'properties') {
+                $this->attributes[$prop] = new AssetProperties($val);
+            } else {
+                $this->attributes[$prop] = $val;
+            }
+
+            if ($prop === 'source' && str_starts_with($val, 'http')) {
+                $this->attributes['origin'] = AssetTypes::REMOTE;
+            }
+        }
+
+        if ($this->attributes['origin'] === AssetTypes::LOCAL) {
+            $this->attributes['copy'] = true;
+        }
+    }
+
+    public function __get($name)
+    {
+        if (array_key_exists($name, $this->attributes)) {
+            return $this->attributes[$name];
+        } elseif (method_exists($this, $name)) {
+            return $this->$name();
+        } else {
+            throw new Exception("Asset.{$name} no existe");
+        }
+    }
+
+    public function __isset($name)
+    {
+        return isset($this->attributes[$name]);
+    }
+
+    public function render(): string
+    {
+        $returnValue = "";
+
+        if ($this->isCopyable()) {
+            $this->copyAsset();
+        }
+
+        $assetUrl = $this->getAssetUrl();
+        $properties = "";
+
+        if (isset($this->properties)) {
+            $properties = " {$this->properties}";
+        }
+
+
+        $returnValue = match ($this->type) {
+            AssetTypes::JS => "<script src=\"{$assetUrl}\" defer{$properties}></script>" . PHP_EOL,
+            AssetTypes::CSS => "<link href=\"{$assetUrl}\" rel=\"stylesheet\"{$properties}>" . PHP_EOL,
+            default => ""
+        };
+
+        return $returnValue;
+    }
+
+    private function isCopyable(): bool
+    {
+        $returnValue = false;
+
+        if ($this->copy) {
+            if ($this->verifyAssetExists()) {
+                $returnValue = match ($this->origin) {
+                    AssetTypes::LOCAL => $this->verifyAssetMd5Local(),
+                    AssetTypes::REMOTE => $this->verifyAssetMd5Remote(),
+                    default => false
+                };
+            } else {
+                $returnValue = true;
+            }
+        }
+
+        return $returnValue;
+    }
+
+    private function copyAsset()
+    {
+        $assetPathDest = $this->getAssetPath();
+        $this->verifyAssetDirectory();
+
+        switch ($this->origin) {
+            case AssetTypes::LOCAL:
+                $frameworkPath = $this->getAssetFrameworkPath();
+                copy($frameworkPath, $assetPathDest);
+                break;
+            case AssetTypes::REMOTE:
+                $assetContent = file_get_contents($this->source);
+                file_put_contents($assetPathDest, $assetContent);
+                break;
+        }
+    }
+
+    private function getAssetDirectory()
+    {
+        return "{$this->assetsBasePath}/{$this->type}";
+    }
+
+    private function verifyAssetDirectory()
+    {
+        $assetDirectory = $this->getAssetDirectory();
+
+        if (!file_exists($assetDirectory)) {
+            mkdir($assetDirectory);
+        }
+    }
+
+    private function verifyAssetExists()
+    {
+        return file_exists($this->getAssetPath());
+    }
+
+    private function getAssetFrameworkPath(): string
+    {
+        return __DIR__ . "/{$this->source}";
+    }
+
+    private function getAssetPath()
+    {
+        return "{$this->getAssetDirectory()}/{$this->dest}";
+    }
+
+    private function getAssetUrl()
+    {
+        $returnValue = "/assets/{$this->type}/{$this->dest}";
+
+        if ($this->origin === AssetTypes::REMOTE && !$this->copy) {
+            $returnValue = $this->source;
+        }
+        
+        return $returnValue;
+    }
+
+    private function verifyAssetMd5Local()
+    {
+        $assetFramework = $this->getAssetFrameworkPath();
+        $assetPath = $this->getAssetPath();
+
+        return md5_file($assetFramework) !== md5_file($assetPath);
+    }
+
+    private function verifyAssetMd5Remote()
+    {
+        $assetPath = $this->getAssetPath();
+        $assetRemoteContent = file_get_contents($this->source);
+        $assetLocalContent = file_get_contents($assetPath);
+
+        return md5($assetRemoteContent) !== md5($assetLocalContent);
+    }
+}

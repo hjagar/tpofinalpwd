@@ -2,6 +2,11 @@
 
 namespace PhpMvc\Framework\View;
 
+use PhpMvc\Framework\Assets\Asset;
+use PhpMvc\Framework\Assets\AssetsManager;
+use PhpMvc\Framework\Assets\AssetsMap;
+use PhpMvc\Framework\Assets\AssetTypes;
+
 class Environment
 {
     private static $instance;
@@ -47,9 +52,19 @@ class Environment
         return $this->layout;
     }
 
-    public function includeView(string $view, array $data = []) {
+    public function includeView(string $view, array $data = [])
+    {
         $viewsPath = app()->getViewPath();
         $partialView = new View($viewsPath);
         $partialView->renderPartial($view, $data);
+    }
+
+    public function assets($assets): string
+    {
+        if (is_string($assets)) {
+            $assets = [$assets];
+        }        
+        $assetsManager = new AssetsManager();
+        return $assetsManager->render($assets);
     }
 }

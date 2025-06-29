@@ -20,6 +20,9 @@
         "role": "<?php if(role(expr)): ?>",
         "endrole": "<?php endif; ?>",
         "include": "<?php echo $env->includeView(expr); ?>",
-        "csrf": "<?php echo csrf(); ?>"
+        "csrf": "<?php echo csrf(); ?>",
+        "assets": "<?php echo $env->assets(expr); ?>",
+        "emailPattern": "<?php echo emailPattern(); ?>",
+        "selected": "<?php echo ((expr) ? 'selected' : ''); ?>"
     }
 }
