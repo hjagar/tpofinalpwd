@@ -13,8 +13,33 @@ class Compra extends Model
         'estados' => [ModelRelationType::HasMany, CompraEstado::class]
     ];
 
+    private function sqlComprasFrom(): string
+    {
+        $sql =
+            "FROM compra AS c
+                INNER JOIN (
+                    SELECT ce.idcompra, MAX(ce.idcompraestado) AS idcompraestado
+                    FROM compraestado AS ce
+                    GROUP BY ce.idcompra
+                ) AS ivce
+                    ON c.idcompra = ivce.idcompra
+                INNER JOIN compraestado AS ce
+                    ON ivce.idcompraestado = ce.idcompraestado
+                INNER JOIN compraestadotipo AS cet
+                    ON ce.idcompraestadotipo = cet.idcompraestadotipo
+                INNER JOIN usuario AS u
+                    ON c.idusuario = u.idusuario
+                INNER JOIN compraitem AS ci
+                    ON c.idcompra = ci.idcompra
+                INNER JOIN producto AS p
+                    ON ci.idproducto = p.idproducto";
+
+        return $sql;
+    }
+
     private function sqlComprasSelectFrom(): string
     {
+        $sqlFrom = $this->sqlComprasFrom();
         $sql =
             "SELECT
                 c.idcompra,
@@ -39,30 +64,14 @@ class Compra extends Model
                     WHEN cet.nombre = 'cancelada' THEN 'bg-danger'		
                 END AS estado_badge,
                 SUM(p.precio * ci.cantidad) AS total
-            FROM compra AS c
-                INNER JOIN (
-                    SELECT ce.idcompra, MAX(ce.idcompraestado) AS idcompraestado
-                    FROM compraestado AS ce
-                    GROUP BY ce.idcompra
-                ) AS ivce
-                    ON c.idcompra = ivce.idcompra
-                INNER JOIN compraestado AS ce
-                    ON ivce.idcompraestado = ce.idcompraestado
-                INNER JOIN compraestadotipo AS cet
-                    ON ce.idcompraestadotipo = cet.idcompraestadotipo
-                INNER JOIN usuario AS u
-                    ON c.idusuario = u.idusuario
-                INNER JOIN compraitem AS ci
-                    ON c.idcompra = ci.idcompra
-                INNER JOIN producto AS p
-                    ON ci.idproducto = p.idproducto";
+            {$sqlFrom}";
 
         return $sql;
     }
 
     private function sqlComprasGroupBy(): string
     {
-        $sql = 
+        $sql =
             "GROUP BY 
                 c.idcompra,
                 u.idusuario,
@@ -75,16 +84,39 @@ class Compra extends Model
         return $sql;
     }
 
-    public function sqlComprasAll()
+    public function sqlComprasAll(): string
     {
         $sql = "{$this->sqlComprasSelectFrom()} {$this->sqlComprasGroupBy()}";
 
         return $sql;
     }
 
-    public function sqlCompraOne()
+    public function sqlCompraOne(): string
     {
-        $sql = $sql = "{$this->sqlComprasSelectFrom()} WHERE c.idcompra = ? {$this->sqlComprasGroupBy()}";;
+        $sql = "{$this->sqlComprasSelectFrom()} WHERE c.idcompra = ? {$this->sqlComprasGroupBy()}";;
+
+        return $sql;
+    }
+
+    public function sqlMyPurchases(): string
+    {
+        $sql = "{$this->sqlComprasSelectFrom()} WHERE c.idusuario = ? {$this->sqlComprasGroupBy()}";;
+
+        return $sql;
+    }
+
+    public function sqlMyPurchasesDetails(): string
+    {
+        $sqlFrom = $this->sqlComprasFrom();
+        $sql =
+            "SELECT
+                c.idcompra,
+                p.nombre AS producto,
+                p.precio, 
+                ci.cantidad,
+                (p.precio * ci.cantidad) AS total
+            {$sqlFrom}
+            WHERE c.idcompra = ?";
 
         return $sql;
     }

@@ -2,6 +2,8 @@
 
 namespace App\Controllers;
 
+use App\Models\Compra;
+
 class MyPurchasesController
 {
     /**
@@ -11,19 +13,7 @@ class MyPurchasesController
      */
     public function index()
     {
-        // Aquí se obtendrían las compras del usuario autenticado
-        // Por ejemplo, usando un modelo de compra
-        $compras = [
-            (object)[
-                'idcompra' => 1,
-                'customer' => 'Juan Pérez',
-                'fecha' => '2024-06-01',
-                'total' => 1500.00,
-                'product' => 'Notebook Lenovo',
-                'status' => 'Completada'
-            ]
-        ];
-
+        $compras = Compra::rawQueryAll('sqlMyPurchases', [auth()->user()->idusuario]);
         return view('my_purchases.index', compact('compras'));
     }
 
@@ -35,19 +25,13 @@ class MyPurchasesController
      */
     public function show($id)
     {
-        $purchase = (object)[
-            'idcompra' => 1,
-            'customer' => 'Juan Pérez',
-            'fecha' => '2024-06-01',
-            'total' => 1500.00,
-            'product' => 'Notebook Lenovo',
-            'status' => 'Completada'
-        ]; // Obtener la compra por ID
+        $purchase = Compra::rawQueryOne('sqlCompraOne', [$id]);
+        $purchaseDetails = Compra::rawQueryAll('sqlMyPurchasesDetails', [$id]);
 
         if (!$purchase) {
-            return redirect('my_purchases.index')->with('error', 'Compra no encontrada.');
+            redirect('my_purchases.index')->with('error', 'Compra no encontrada.');
         }
 
-        return view('my_purchases.show', compact('purchase'));
+        return view('my_purchases.show', compact('purchase', 'purchaseDetails'));
     }
 }
