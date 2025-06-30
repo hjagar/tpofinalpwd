@@ -37,12 +37,12 @@ class SalesController
     public function update(Request $request, int $id)
     {
         $now = time();
-        $todayData = date('Y-m-d', $now);
+        $todayData = date('Y-m-d H:i:s', $now);
         $todayEmail = date('d/m/Y', $now);
         $sale = Compra::rawQueryOne('sqlCompraOne', [$id]);
 
         // Buscar el estado anterior para actualizar la fecha fin
-        $compraEstadoAnterior = CompraEstado::where(['idcompra', $id])
+        $compraEstadoAnterior = CompraEstado::where(['idcompra' => $id])
             ->orderBy('fechainicio', OrderDirectionType::DESC)
             ->limit(1)
             ->first();
@@ -52,20 +52,21 @@ class SalesController
         // crear un nuevo estado
         $compraEstado = new CompraEstado();
         $compraEstado->idcompra = $id;
-        $compraEstado->idcompraestadotipo = $request->idcompraestadotipo;
+        $compraEstado->idcompraestadotipo = $request->status;
         $compraEstado->fechainicio = $todayData;
         $compraEstado->insert();
 
-        $compraTipoEstado = CompraEstadoTipo::find($request->idcompraestadotipo);
-        $estado = $compraEstado->nombre;
+        $compraTipoEstado = CompraEstadoTipo::find($request->status);
+        $estado = $compraTipoEstado->nombre;
 
         // Enviar Email
-        $template = "sales.templates.{$estado}";
+        $template = "admin.sales.templates.{$estado}";
         $templateCompiler = new TemplateCompiler($template);
         $data = [
             'nombre' => $sale->usuario,
             'estado' => $estado,
-            'fecha' => $todayEmail
+            'fecha' => $todayEmail,
+            'appName' => env('APP_NAME')
         ];
         $emailBody = $templateCompiler->render($data);
         $this->emailSender->send($sale->email, 'Actualización de estado de compra', $emailBody, true);

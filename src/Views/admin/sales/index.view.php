@@ -11,8 +11,7 @@
           <tr>
             <th>#</th>
             <th>Fecha</th>
-            <th>Producto</th>
-            <th>Cantidad</th>
+            <th>Productos</th>
             <th>Precio</th>
             <th>Usuario</th>
             <th>Estado</th>
@@ -24,18 +23,17 @@
             <tr>
               <td>{{ $venta->idcompra }}</td>
               <td>{{ $venta->fecha }}</td>
-              <td>{{ $venta->producto }}</td>
-              <td>{{ $venta->cantidad ?? 1 }}</td>
+              <td>{{ $venta->productos }}</td>
               <td class="text-end">
                 <div class="pe-5">${{ number_format($venta->total, 2, ',', '.') }}</div>
               </td>
               <td>{{ $venta->usuario }}</td>
-              <td>
+              <td>{{ $venta->estado_emoji }} 
                 <span class="badge {{ $venta->estado_badge }}">
-                  {{ $venta->estado_emoji }} {{ $venta->estado }}
+                  {{ $venta->estado }}
                 </span>
               </td>
-              <td>
+              <td class="text-center">
                 <a href="{{ route('admin.sales.edit', [$venta->idcompra]) }}" class="btn btn-warning btn-sm me-1">Editar</a>
               </td>
             </tr>

@@ -29,7 +29,7 @@ class TemplateCompiler
 
     private function processIncludes($templateContent) {
         $templateContent = preg_replace_callback('/\{\{\s*include\s+[\'"](.+?)[\'"]\s*\}\}/', function ($matches) {
-            $includePath =  $this->makeTemplateFilename($matches[1]); // $this->basePath . '/' . $matches[1];
+            $includePath =  $this->makeTemplateFilename($matches[1], '.html'); // $this->basePath . '/' . $matches[1];
             if (!file_exists($includePath)) {
                 throw new Exception("Included file not found: $includePath");
             }

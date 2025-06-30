@@ -3,6 +3,7 @@
 namespace PhpMvc\Framework\Data;
 
 use PhpMvc\Framework\Concerns\HasSplitKey;
+use PhpMvc\Framework\Data\Constants\OrderDirectionType;
 use PhpMvc\Framework\Data\Constants\QueryBuilderIndexType;
 use PhpMvc\Framework\Data\Constants\SelectQueryIndexType;
 
@@ -99,16 +100,7 @@ class QueryBuilder
 
     public function where(array $conditions): QueryBuilder
     {
-        // if ($conditions === null) {
-        //     $conditions = array_flip($this->getPrimaryKey());
-        // }
-
         $whereClauses = array_map(fn($key) => "{$key} = :{$this->splitKey($key)}", array_keys($conditions));
-        // $whereClauses = array_map(function ($key) {
-        //     //$splittedKey = explode('.', $key);
-        //     $paramKey = $this->splitKey($key);
-        //     return "{$key} = :{$paramKey}";
-        // }, array_keys($conditions));
         $whereConditions = $this->query[QueryBuilderIndexType::WhereConditions];
         $whereConditions = array_unique(array_merge($whereConditions, $whereClauses));
         $this->query[QueryBuilderIndexType::WhereConditions] = $whereConditions;
@@ -117,7 +109,7 @@ class QueryBuilder
         return $this;
     }
 
-    public function orderBy($column, $direction = 'ASC'): QueryBuilder
+    public function orderBy($column, $direction = OrderDirectionType::ASC): QueryBuilder
     {
         $orderByClauses = $this->query[QueryBuilderIndexType::OrderByClauses];
         $orderByClauses = array_unique(array_merge($orderByClauses, ["{$column} {$direction}"]));
@@ -150,7 +142,7 @@ class QueryBuilder
         $orderClauses = $this->query[QueryBuilderIndexType::OrderByClauses];
 
         if (!empty($orderClauses)) {
-            $this->setSqlStatement(SelectQueryIndexType::OrderBy, implode(', ', $joinClauses));
+            $this->setSqlStatement(SelectQueryIndexType::OrderBy, "ORDER BY " . implode(', ', $orderClauses));
         }
 
         $query = trim(implode(' ', $this->query['SqlStatement']));

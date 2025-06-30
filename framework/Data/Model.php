@@ -152,7 +152,6 @@ abstract class Model
     {
         $instance = new static();
         $queryBuilder = $instance->queryBuilder;
-        //$instance->params = $instance->prepareParams($conditions);
         $queryBuilder
             ->select()
             ->from()
@@ -293,13 +292,13 @@ abstract class Model
             foreach ($this->attributes as $key => $value) {
                 if (!in_array($key, $this->getPrimaryKey())) {
                     $setClauses[] = "{$key} = :{$key}";
-                    $params[$key] = $value;
+                    $params[":{$key}"] = $value;
                 }
             }
 
             if (!empty($setClauses)) {
                 $where = $this->whereClause();
-                $query = "UPDATE {$tableName} SET " . implode(', ', $setClauses) . "{$where}";
+                $query = "UPDATE {$tableName} SET " . implode(', ', $setClauses) . $where;
                 $params = array_merge($params, $this->prepareParams($this->primaryKeyAttributes));
 
                 if ($returnValue = $this->database->execute($query, $params)) {
@@ -524,6 +523,13 @@ abstract class Model
         }
 
         return $returnValue;
+    }
+
+    private function whereClause() {
+        $primaryKey = $this->getPrimaryKey();
+        $whereClauses = array_map(fn($key) => "{$key} = :{$key}", $primaryKey);
+
+        return " WHERE " . implode(' AND ', $whereClauses);
     }
     #endregion
 }
