@@ -27,7 +27,6 @@ class UserController
         redirect('admin.users.index');
     }
 
-
     public function edit(int $id)
     {
         $usuario = Usuario::find($id);

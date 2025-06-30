@@ -3,6 +3,7 @@
 namespace PhpMvc\Framework\Assets;
 
 use Exception;
+use PhpMvc\Framework\Assets\Constants\AssetType;
 use stdClass;
 
 class Asset

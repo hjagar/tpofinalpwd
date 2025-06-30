@@ -1,6 +1,6 @@
 <?php
 
-namespace PhpMvc\Framework\Assets;
+namespace PhpMvc\Framework\Assets\Constants;
 
 class AssetType
 {
