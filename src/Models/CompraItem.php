@@ -3,12 +3,12 @@
 namespace App\Models;
 
 use PhpMvc\Framework\Data\Model;
-use PhpMvc\Framework\Data\Constants\ModelRelations;
+use PhpMvc\Framework\Data\Constants\ModelRelationType;
 
 class CompraItem extends Model
 {
     protected array $relations = [
-        'compra' => [ModelRelations::BelongsTo, Compra::class],
-        'producto' => [ModelRelations::BelongsTo, Producto::class],
+        'compra' => [ModelRelationType::BelongsTo, Compra::class],
+        'producto' => [ModelRelationType::BelongsTo, Producto::class],
     ];
 }

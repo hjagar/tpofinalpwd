@@ -4,12 +4,11 @@ namespace PhpMvc\Framework\Data;
 
 use ArrayObject;
 use Exception;
-use PhpMvc\Framework\Concerns\SplitKey;
+use PhpMvc\Framework\Concerns\HasSplitKey;
 use ReflectionClass;
 use PhpMvc\Framework\Data\Database;
-use PhpMvc\Framework\Data\Constants\ModelAffixes;
-use PhpMvc\Framework\Data\Constants\ModelRelations;
-use PhpMvc\Framework\Http\Request;
+use PhpMvc\Framework\Data\Constants\ModelAffixType;
+use PhpMvc\Framework\Data\Constants\ModelRelationType;
 
 abstract class Model
 {
@@ -34,7 +33,7 @@ abstract class Model
     private string $mapToClass = '';
     #endregion
 
-    use SplitKey;
+    use HasSplitKey;
 
     #region Constructor
     public function __construct()
@@ -42,9 +41,8 @@ abstract class Model
         $this->database = Database::getInstance();
         $this->pluralize = new Pluralize();
         $this->queryBuilder = new QueryBuilder($this);
-        $this->primaryKeyPreffix = env('PRIMARY_KEY_PREFFIX', ModelAffixes::none->value);
-        $this->primaryKeySuffix = env('PRIMARY_KEY_SUFFIX', ModelAffixes::none->value);
-
+        $this->primaryKeyPreffix = env('PRIMARY_KEY_PREFFIX', ModelAffixType::none->value);
+        $this->primaryKeySuffix = env('PRIMARY_KEY_SUFFIX', ModelAffixType::none->value);
     }
     #endregion
 
@@ -405,31 +403,18 @@ abstract class Model
         $returnValue = '';
 
         if (is_string($affix)) {
-            $modelAffix = ModelAffixes::tryFrom($affix);
+            $modelAffix = ModelAffixType::tryFrom($affix);
 
             if ($modelAffix) {
-                switch ($modelAffix) {
-                    case ModelAffixes::modelname:
-                        $returnValue = strtolower($this->getModelShortName());
-                        break;
-                    case ModelAffixes::MODELNAME:
-                        $returnValue = strtoupper($this->getModelShortName());
-                        break;
-                    case ModelAffixes::MODEL_NAME:
-                        $returnValue = strtoupper(preg_replace('/(?<!^)[A-Z]/', '_$0', $this->getModelShortName()));
-                        break;
-                    case ModelAffixes::model_name:
-                        $returnValue = strtolower(preg_replace('/(?<!^)[A-Z]/', '_$0', $this->getModelShortName()));
-                        break;
-                    case ModelAffixes::modelName:
-                        $returnValue = lcfirst($this->getModelShortName());
-                        break;
-                    case ModelAffixes::MoldeName:
-                        $returnValue = $this->getModelShortName();
-                        break;
-                    default:
-                        $returnValue = '';
-                }
+                $returnValue = match ($modelAffix) {
+                    ModelAffixType::modelname => strtolower($this->getModelShortName()),
+                    ModelAffixType::MODELNAME => strtoupper($this->getModelShortName()),
+                    ModelAffixType::MODEL_NAME => strtoupper(preg_replace('/(?<!^)[A-Z]/', '_$0', $this->getModelShortName())),
+                    ModelAffixType::model_name => strtolower(preg_replace('/(?<!^)[A-Z]/', '_$0', $this->getModelShortName())),
+                    ModelAffixType::modelName => lcfirst($this->getModelShortName()),
+                    ModelAffixType::MoldeName => $this->getModelShortName(),
+                    default => ''
+                };
             }
         }
 
@@ -477,10 +462,6 @@ abstract class Model
     private function makePlaceholders(array $columns): array
     {
         return array_map(fn($key) => ":{$this->splitKey($key)}", $columns);
-        // return array_map(function($key) {
-        //     $paramKey = $this->splitKey($key);
-        //     return ":{$paramKey}";
-        // }, $columns);
     }
 
     private function setQueryAndParams(string $query, array $params): void
@@ -502,9 +483,9 @@ abstract class Model
             [$relationType, $modelClass] = $this->relations[$relationName];
             $modelInstance = new $modelClass();
 
-            if ($relationType === ModelRelations::HasMany) {
+            if ($relationType === ModelRelationType::HasMany) {
                 $returnValue = new ArrayObject($modelInstance->where([$modelInstance->getPrimaryKey()[0] => $this->attributes[$this->getPrimaryKey()[0]]])->get());
-            } elseif ($relationType === ModelRelations::BelongsTo) {
+            } elseif ($relationType === ModelRelationType::BelongsTo) {
                 $returnValue = $modelInstance->find($this->attributes[$modelInstance->getPrimaryKey()[0]]);
             }
         }
@@ -529,88 +510,6 @@ abstract class Model
             $tableName = $this->getTableName();
             $primaryKeyFullName = "{$tableName}.{$primaryKey}";
             $returnValue = $this->queryBuilder->where([$primaryKeyFullName => $this->attributes[$primaryKey]]);
-
-            //$this->param = $this->prepareParams();
-            // if ($relationType === ModelRelations::HasMany) {
-            //     /* 
-            //     $this: Compra,
-            //     $modelInstance: CompraItem,
-            //     relation: items,
-            //     $this->getPrimaryKey()[0]: 'idcompra',
-            //     $this->attributes[$this->getPrimaryKey()[0]]: <ID de la compra X>
-            //     descripcion: Filtro los CompraItem que tienen el idcompra igual al id de la compra actual.
-            //     */
-            //     $returnValue = $this->queryBuilder->where([$this->getPrimaryKey()[0] => $this->attributes[$this->getPrimaryKey()[0]]]);
-            // } elseif ($relationType === ModelRelations::BelongsTo) {
-            //     /*
-            //      $this: Compra, 
-            //      $modelInstance: Usuario, 
-            //      relation: user, 
-            //      $modelInstance->getPrimaryKey()[0]: 'idusuario',
-            //      $this->attributes[$modelInstance->getPrimaryKey()[0]]: <ID del usuario en Compra X>
-            //      descripcion: Busco el Usuario que tiene el idusuario igual al id del usuario en la compra actual.
-            //     */
-            //     $returnValue = $this->queryBuilder->where([$modelInstance->getPrimaryKey()[0] => $this->attributes[$modelInstance->getPrimaryKey()[0]]]);
-            // } elseif ($relationType === ModelRelations::BelongsToMany) {
-            //     /*
-            //      $this: Usuario, 
-            //      $modelInstance: Rol, 
-            //      relation: roles,
-            //      pivot: usuariorol,
-            //      $modelInstance->getPrimaryKey()[0]: 'idrol',
-            //      $this->attributes[$modelInstance->getPrimaryKey()[0]]: <ID del rol en Usuario X>
-            //      descripcion: Busco los Roles que tienen el idrol igual al id del rol en el usuario actual.
-            //     */
-
-            //     $returnValue = $this->queryBuilder->where([$primaryKeyFullName => $this->attributes[$primaryKey]]);
-            // }
-        }
-
-        return $returnValue;
-    }
-
-    private function getRelationQueryableOld(string $relationName): QueryBuilder
-    {
-        $returnValue = null;
-
-        if (array_key_exists($relationName, $this->relations)) {
-            [$relationType, $modelClass, $pivot] = $this->relations[$relationName] + [null, null, null];
-            $modelInstance = new $modelClass();
-            $queryBuilder = $modelInstance->queryBuilder;
-            $queryBuilder->select()->from();
-
-            if ($relationType === ModelRelations::HasMany) {
-                /* 
-                $this: Compra,
-                $modelInstance: CompraItem,
-                relation: items,
-                $this->getPrimaryKey()[0]: 'idcompra',
-                $this->attributes[$this->getPrimaryKey()[0]]: <ID de la compra X>
-                descripcion: Filtro los CompraItem que tienen el idcompra igual al id de la compra actual.
-                */
-                $returnValue = $queryBuilder->where([$this->getPrimaryKey()[0] => $this->attributes[$this->getPrimaryKey()[0]]]);
-            } elseif ($relationType === ModelRelations::BelongsTo) {
-                /*
-                 $this: Compra, 
-                 $modelInstance: Usuario, 
-                 relation: user, 
-                 $modelInstance->getPrimaryKey()[0]: 'idusuario',
-                 $this->attributes[$modelInstance->getPrimaryKey()[0]]: <ID del usuario en Compra X>
-                 descripcion: Busco el Usuario que tiene el idusuario igual al id del usuario en la compra actual.
-                */
-                $returnValue = $queryBuilder->where([$modelInstance->getPrimaryKey()[0] => $this->attributes[$modelInstance->getPrimaryKey()[0]]]);
-            } elseif ($relationType === ModelRelations::BelongsToMany) {
-                /*
-                 $this: Usuario, 
-                 $modelInstance: Rol, 
-                 relation: roles,
-                 pivot: usuariorol,
-                 $modelInstance->getPrimaryKey()[0]: 'idrol',
-                 $this->attributes[$modelInstance->getPrimaryKey()[0]]: <ID del rol en Usuario X>
-                 descripcion: Busco los Roles que tienen el idrol igual al id del rol en el usuario actual.
-                */
-                $returnValue = $queryBuilder->where([$modelInstance->getPrimaryKey()[0] => $this->attributes[$modelInstance->getPrimaryKey()[0]]]);
-            }
         }
 
         return $returnValue;

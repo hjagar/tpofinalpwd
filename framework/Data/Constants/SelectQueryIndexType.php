@@ -2,7 +2,7 @@
 
 namespace PhpMvc\Framework\Data\Constants;
 
-class SelectQueryIndexes
+class SelectQueryIndexType
 {
     public const Select = 0;
     public const From = 1;

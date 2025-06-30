@@ -3,12 +3,12 @@
 namespace App\Models;
 
 use PhpMvc\Framework\Data\Model;
-use PhpMvc\Framework\Data\Constants\ModelRelations;
+use PhpMvc\Framework\Data\Constants\ModelRelationType;
 
 class Rol extends Model
 {
     protected array $relations = [
-        'usuarios' => [ModelRelations::BelongsToMany, Usuario::class, 'usuariorol'],
-        'menus' => [ModelRelations::BelongsToMany, Menu::class, 'menurol'],
+        'usuarios' => [ModelRelationType::BelongsToMany, Usuario::class, 'usuariorol'],
+        'menus' => [ModelRelationType::BelongsToMany, Menu::class, 'menurol'],
     ];
 }

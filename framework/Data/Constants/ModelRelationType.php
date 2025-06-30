@@ -2,7 +2,7 @@
 
 namespace PhpMvc\Framework\Data\Constants;
 
-class ModelRelations
+class ModelRelationType
 {
     public const BelongsTo = 'BelongsTo';
     public const HasMany = 'HasMany';

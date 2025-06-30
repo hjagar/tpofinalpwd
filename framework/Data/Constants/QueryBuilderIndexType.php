@@ -2,7 +2,7 @@
 
 namespace PhpMvc\Framework\Data\Constants;
 
-class QueryBuilderIndexes
+class QueryBuilderIndexType
 {
     public const SqlStatement = 'SqlStatement';
     public const WhereConditions = 'WhereConditions';

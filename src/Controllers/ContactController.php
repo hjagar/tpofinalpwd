@@ -3,6 +3,7 @@
 namespace App\Controllers;
 
 use PhpMvc\Framework\Http\Request;
+use PhpMvc\Framework\Mail\EmailSender;
 
 class ContactController
 {
@@ -14,26 +15,19 @@ class ContactController
     public function store(Request $request)
     {
         $data = $request->all();
-
-        // Validar los datos del formulario
-        $this->validate($data);
-
-        // Procesar el envío del formulario
         $this->sendContactEmail($data);
 
-        // Redirigir o mostrar un mensaje de éxito
-        return redirect('contact.index')->with('success', 'Mensaje enviado correctamente.');
+        redirect('contact.index')->with('flash', 'Mensaje enviado correctamente.');
     }
+
     /**
      * Validates the contact form data.
-     *
+     * TODO: incorporar un validate al Request cuando incorpore ajax
      * @param array $data
      * @throws \InvalidArgumentException
      */
     private function validate(array $data)
     {
-        // Aquí se implementaría la lógica de validación
-        // Por ejemplo, verificar que los campos requeridos no estén vacíos
         if (empty($data['name']) || empty($data['email']) || empty($data['message'])) {
             throw new \InvalidArgumentException('Todos los campos son obligatorios.');
         }
@@ -42,6 +36,7 @@ class ContactController
         }
         // Otras validaciones según sea necesario
     }
+
     /**
      * Sends the contact email.
      *
@@ -49,8 +44,7 @@ class ContactController
      */
     private function sendContactEmail(array $data)
     {
-        // Aquí se implementaría la lógica para enviar el correo electrónico
-        // Por ejemplo, usando una librería de envío de correos
-        // mail($data['email'], 'Contacto', $data['message']);
+        $emailSender = new EmailSender();
+        return $emailSender->sendFrom($data['email'], $data['name'], 'tiendatuya@gmail.com', 'Mensaje de Cliente', $data['message'], true);
     }
 }

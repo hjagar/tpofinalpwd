@@ -25,11 +25,12 @@ class DotEnv
         }
     }
 
-    public static function getOption($key, $default) {
+    public static function getOption($key, $default)
+    {
         $value = $_ENV[$key] ?? $_SERVER[$key] ?? $default;
         $returnValue = $value;
 
-        switch($value) {
+        switch ($value) {
             case 'true':
             case 'yes':
                 $returnValue = true;

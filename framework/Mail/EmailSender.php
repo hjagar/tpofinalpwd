@@ -66,4 +66,13 @@ class EmailSender
             $this->mailer->clearAddresses();
         }
     }
+
+    public function sendFrom(string $fromEmail, string $fromName, string $to, string $subject, string $body, bool $isHtml = false)
+    {
+        $this->mailer->setFrom($fromEmail, $fromName);
+        $returnValue = $this->send($to, $subject, $body, $isHtml);
+        $this->mailer->setFrom($this->fromEmail, $this->fromName);
+
+        return $returnValue;
+    }
 }

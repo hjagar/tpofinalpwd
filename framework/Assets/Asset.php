@@ -9,7 +9,7 @@ class Asset
 {
     private array $attributes = [
         'assetsBasePath' => '',
-        'origin' => AssetTypes::LOCAL
+        'origin' => AssetType::LOCAL
     ];
 
     public function __construct(string $assetBasePath, stdClass $rawAsset)
@@ -24,11 +24,11 @@ class Asset
             }
 
             if ($prop === 'source' && str_starts_with($val, 'http')) {
-                $this->attributes['origin'] = AssetTypes::REMOTE;
+                $this->attributes['origin'] = AssetType::REMOTE;
             }
         }
 
-        if ($this->attributes['origin'] === AssetTypes::LOCAL) {
+        if ($this->attributes['origin'] === AssetType::LOCAL) {
             $this->attributes['copy'] = true;
         }
     }
@@ -66,8 +66,8 @@ class Asset
 
 
         $returnValue = match ($this->type) {
-            AssetTypes::JS => "<script src=\"{$assetUrl}\" defer{$properties}></script>" . PHP_EOL,
-            AssetTypes::CSS => "<link href=\"{$assetUrl}\" rel=\"stylesheet\"{$properties}>" . PHP_EOL,
+            AssetType::JS => "<script src=\"{$assetUrl}\" defer{$properties}></script>" . PHP_EOL,
+            AssetType::CSS => "<link href=\"{$assetUrl}\" rel=\"stylesheet\"{$properties}>" . PHP_EOL,
             default => ""
         };
 
@@ -81,8 +81,8 @@ class Asset
         if ($this->copy) {
             if ($this->verifyAssetExists()) {
                 $returnValue = match ($this->origin) {
-                    AssetTypes::LOCAL => $this->verifyAssetMd5Local(),
-                    AssetTypes::REMOTE => $this->verifyAssetMd5Remote(),
+                    AssetType::LOCAL => $this->verifyAssetMd5Local(),
+                    AssetType::REMOTE => $this->verifyAssetMd5Remote(),
                     default => false
                 };
             } else {
@@ -99,11 +99,11 @@ class Asset
         $this->verifyAssetDirectory();
 
         switch ($this->origin) {
-            case AssetTypes::LOCAL:
+            case AssetType::LOCAL:
                 $frameworkPath = $this->getAssetFrameworkPath();
                 copy($frameworkPath, $assetPathDest);
                 break;
-            case AssetTypes::REMOTE:
+            case AssetType::REMOTE:
                 $assetContent = file_get_contents($this->source);
                 file_put_contents($assetPathDest, $assetContent);
                 break;
@@ -143,7 +143,7 @@ class Asset
     {
         $returnValue = "/assets/{$this->type}/{$this->dest}";
 
-        if ($this->origin === AssetTypes::REMOTE && !$this->copy) {
+        if ($this->origin === AssetType::REMOTE && !$this->copy) {
             $returnValue = $this->source;
         }
         

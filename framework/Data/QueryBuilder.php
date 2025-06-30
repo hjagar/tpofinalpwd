@@ -2,7 +2,7 @@
 
 namespace PhpMvc\Framework\Data;
 
-use PhpMvc\Framework\Concerns\SplitKey;
+use PhpMvc\Framework\Concerns\HasSplitKey;
 use PhpMvc\Framework\Data\Constants\QueryBuilderIndexes;
 use PhpMvc\Framework\Data\Constants\SelectQueryIndexes;
 
@@ -10,7 +10,7 @@ class QueryBuilder
 {
     private array $query;
 
-    use SplitKey;
+    use HasSplitKey;
 
     /**
      * El constructor de QueryBuilder crea una propiedad privada $query donde el primer elemento
