@@ -9,7 +9,7 @@ class MenuController
 {
     public function index()
     {
-        //$menus = Menu::with(['padre', 'roles'])->get(); TODO
+        //$menus = Menu::with(['padre', 'roles'])->get(); TODO ver esto para el listado de menus
         $menus = Menu::all();
         return view('admin.menus.index', compact('menus'));
     }

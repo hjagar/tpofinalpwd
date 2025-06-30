@@ -3,7 +3,7 @@
 namespace App\Models;
 
 use PhpMvc\Framework\Data\Model;
-use PhpMvc\Framework\Data\Constants\ModelRelations;
+use PhpMvc\Framework\Data\Constants\ModelRelationType;
 
 /**
  * Class Usuario
@@ -19,8 +19,8 @@ class Usuario extends Model
     protected array $fillable = ['usnombre', 'usmail'];
 
     protected array $relations = [
-        'roles' => [ModelRelations::BelongsToMany, Rol::class, 'usuariorol'],
-        'compras' => [ModelRelations::HasMany, Compra::class],
+        'roles' => [ModelRelationType::BelongsToMany, Rol::class, 'usuariorol'],
+        'compras' => [ModelRelationType::HasMany, Compra::class],
     ];
 
     /**

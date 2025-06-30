@@ -2,7 +2,7 @@
 
 namespace PhpMvc\Framework\Concerns;
 
-trait SplitKey
+trait HasSplitKey
 {
     public function splitKey($key): string
     {

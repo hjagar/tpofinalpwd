@@ -21,14 +21,11 @@ Contacto
                     </div>
                     <div class="mb-3">
                         <label for="email" class="form-label">Correo electrónico:</label>
-                        <input type="email" id="email" name="email" class="form-control" autocomplete="off" required  @emailPattern>
+                        <input type="email" id="email" name="email" class="form-control" autocomplete="off" required>
                         <div class="invalid-feedback" data-type="valueMissing">
                             Por favor ingrese un correo electrónico.
                         </div>
                         <div class="invalid-feedback" data-type="typeMismatch">
-                            Por favor ingrese un correo válido.
-                        </div>
-                        <div class="invalid-feedback" data-type="patternMismatch">
                             Por favor ingrese un correo válido.
                         </div>
                     </div>

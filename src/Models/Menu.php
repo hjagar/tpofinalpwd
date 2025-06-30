@@ -3,7 +3,7 @@
 namespace App\Models;
 
 use PhpMvc\Framework\Data\Model;
-use PhpMvc\Framework\Data\Constants\ModelRelations;
+use PhpMvc\Framework\Data\Constants\ModelRelationType;
 
 class Menu extends Model
 {
@@ -17,9 +17,9 @@ class Menu extends Model
     ];
 
     protected array $relations = [
-        'roles' => [ModelRelations::BelongsToMany, Rol::class, 'menurol'],
-        'submenus' => [ModelRelations::HasMany, Menu::class, 'idmenu', 'idpadre'],
-        'padre' => [ModelRelations::BelongsTo, Menu::class, 'idmenu', 'idpadre']
+        'roles' => [ModelRelationType::BelongsToMany, Rol::class, 'menurol'],
+        'submenus' => [ModelRelationType::HasMany, Menu::class, 'idmenu', 'idpadre'],
+        'padre' => [ModelRelationType::BelongsTo, Menu::class, 'idmenu', 'idpadre']
     ];
 
     public function sqlMenusByName(): string

@@ -2,78 +2,74 @@
 
 namespace App\Controllers;
 
+use App\Models\Compra;
+use App\Models\CompraEstado;
+use App\Models\CompraEstadoTipo;
+use PhpMvc\Framework\Data\Constants\OrderDirectionType;
+use PhpMvc\Framework\Http\Request;
+use PhpMvc\Framework\Mail\EmailSender;
+use PhpMvc\Framework\Mail\TemplateCompiler;
+
 class SalesController
 {
+    private EmailSender $emailSender;
+
+    public function __construct()
+    {
+        $this->emailSender = new EmailSender();
+    }
+
     public function index()
     {
-        // Aquí iría la lógica para listar las ventas
-        $sales = [
-            (object)[
-                'id' => 1,
-                'customer' => 'Juan Pérez',
-                'date' => '2024-06-01',
-                'total' => 1500.00,
-                'product' => 'Notebook Lenovo',
-                'status' => 'Completada'
-            ],
-            (object)[
-                'id' => 2,
-                'customer' => 'María Gómez',
-                'date' => '2024-06-02',
-                'total' => 2300.50,
-                'product' => 'Smartphone Samsung',
-                'status' => 'Pendiente'
-            ],
-            (object)[
-                'id' => 3,
-                'customer' => 'Carlos López',
-                'date' => '2024-06-03',
-                'total' => 980.75,
-                'product' => 'Auriculares Sony',
-                'status' => 'Cancelada'
-            ]
-        ];
+        $sales = Compra::rawQueryAll('sqlComprasAll');
 
         return view('admin.sales.index', compact('sales'));
     }
 
     public function edit(int $id)
     {
-        // Aquí iría la lógica para editar una venta específica
-        // Por simplicidad, retornamos una vista de edición con datos ficticios
-        $sale = (object)[
-            'id' => $id,
-            'customer' => 'Juan Pérez',
-            'date' => '2024-06-01',
-            'total' => 1500.00,
-            'product' => 'Notebook Lenovo',
-            'status' => 'Completada',
-            'product_id' => 2,
-            'customer_id' => 3,
-            'quantity' => 5,
-        ];
+        $sale = Compra::rawQueryOne('sqlCompraOne', [$id]);
+        $statuses = CompraEstadoTipo::all();
 
-        $products = [
-            (object)['id' => 1, 'name' => 'Producto A', 'price' => 1000],
-            (object)['id' => 2, 'name' => 'Producto B', 'price' => 1500],
-        ];
-        $customers = [
-            (object)['id' => 3, 'name' => 'Juan Pérez', 'email' => 'juan@mail.com'],
-            (object)['id' => 4, 'name' => 'Ana Gómez', 'email' => 'ana@mail.com'],
-        ];
-
-        return view('admin.sales.edit', compact('sale', 'products', 'customers'));
+        return view('admin.sales.edit', compact('sale', 'statuses'));
     }
 
-    public function update(int $id)
+    public function update(Request $request, int $id)
     {
-        // Aquí iría la lógica para actualizar una venta específica
-        // Por simplicidad, retornamos una redirección a la lista de ventas
-        // En un caso real, se procesarían los datos del formulario y se actualizaría la base de datos
+        $now = time();
+        $todayData = date('Y-m-d H:i:s', $now);
+        $todayEmail = date('d/m/Y', $now);
+        $sale = Compra::rawQueryOne('sqlCompraOne', [$id]);
 
-        // Simulación de actualización exitosa
-        $_SESSION['message'] = 'Venta actualizada correctamente';
+        // Buscar el estado anterior para actualizar la fecha fin
+        $compraEstadoAnterior = CompraEstado::where(['idcompra' => $id])
+            ->orderBy('fechainicio', OrderDirectionType::DESC)
+            ->limit(1)
+            ->first();
+        $compraEstadoAnterior->fechafin = $todayData;
+        $compraEstadoAnterior->update();
 
-        return redirect('admin.sales.index');
+        // crear un nuevo estado
+        $compraEstado = new CompraEstado();
+        $compraEstado->idcompra = $id;
+        $compraEstado->idcompraestadotipo = $request->status;
+        $compraEstado->fechainicio = $todayData;
+        $compraEstado->insert();
+
+        $compraTipoEstado = CompraEstadoTipo::find($request->status);
+        $estado = $compraTipoEstado->nombre;
+
+        // Enviar Email
+        $template = "admin.sales.templates.{$estado}";
+        $templateCompiler = new TemplateCompiler($template);
+        $data = [
+            'nombre' => $sale->usuario,
+            'estado' => $estado,
+            'fecha' => $todayEmail,
+            'appName' => env('APP_NAME')
+        ];
+        $emailBody = $templateCompiler->render($data);
+        $this->emailSender->send($sale->email, 'Actualización de estado de compra', $emailBody, true);
+        redirect('admin.sales.index')->with('flash', 'Venta actualizada correctamente');
     }
 }

@@ -2,7 +2,7 @@
 
 namespace PhpMvc\Framework\Data\Constants;
 
-enum ModelAffixes: string
+enum ModelAffixType: string
 {
     case modelname = 'modelname';
     case MODELNAME = 'MODELNAME';

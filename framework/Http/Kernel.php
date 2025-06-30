@@ -35,7 +35,6 @@ class Kernel
             return $this->router->dispatch($uri, $method, $request);
         });
 
-        //$content = $this->router->dispatch($request->getUri(), $request->getMethod());
         $response = new Response($content, HttpStatus::OK->value, [
             'Content-Type' => 'text/html; charset=UTF-8',
             'X-Powered-By' => Application::NAME,

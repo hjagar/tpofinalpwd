@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+
+{{ include 'admin.sales.templates.partials.head' }}
+
+<body>
+    {{ include 'admin.sales.templates.partials.header' }}
+    <h1>Hola {{ nombre }}!</h1>
+    <p>Tu compra ha sido <strong>{{ estado }}</strong>.</p>
+    <p>Fecha: {{ fecha }}</p>
+    <p>Gracias por comprar con nosotros. Pronto te daremos más información sobre el estado de tu pedido.</p>
+    {{ include 'admin.sales.templates.partials.footer' }}
+</body>
+
+</html>

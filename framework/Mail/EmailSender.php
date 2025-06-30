@@ -21,10 +21,10 @@ class EmailSender
         try {
             $this->mailer->isSMTP();
             $this->mailer->Host = env('SMTP_HOST') ?? 'smtp.gmail.com';
-            $this->mailer->SMTPAuth = true;
+            $this->mailer->SMTPAuth = env('SMTP_AUTH') ?? true;
             $this->mailer->Username = env('SMTP_USERNAME') ?? '';
             $this->mailer->Password = env('SMTP_PASSWORD') ?? '';
-            $this->mailer->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+            $this->mailer->SMTPSecure = env('SMTP_SECURE') !== 'none' ? PHPMailer::ENCRYPTION_STARTTLS : null;
             $this->mailer->Port = (int) (env('SMTP_PORT') ?? 587);
 
             // Configuración del remitente
@@ -65,5 +65,14 @@ class EmailSender
         } finally {
             $this->mailer->clearAddresses();
         }
+    }
+
+    public function sendFrom(string $fromEmail, string $fromName, string $to, string $subject, string $body, bool $isHtml = false)
+    {
+        $this->mailer->setFrom($fromEmail, $fromName);
+        $returnValue = $this->send($to, $subject, $body, $isHtml);
+        $this->mailer->setFrom($this->fromEmail, $this->fromName);
+
+        return $returnValue;
     }
 }

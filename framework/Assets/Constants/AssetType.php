@@ -1,8 +1,9 @@
 <?php
 
-namespace PhpMvc\Framework\Assets;
+namespace PhpMvc\Framework\Assets\Constants;
 
-class AssetTypes {
+class AssetType
+{
     public const JS = 'js';
     public const CSS = 'css';
     public const LOCAL = 'local';

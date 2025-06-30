@@ -118,7 +118,7 @@ class Application
         if ($this->authManager === null) {
             throw new Exception('Authentication service is not available.');
         }
-        
+
         return $this->authManager;
     }
 

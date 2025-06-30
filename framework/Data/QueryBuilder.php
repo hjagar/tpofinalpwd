@@ -2,15 +2,16 @@
 
 namespace PhpMvc\Framework\Data;
 
-use PhpMvc\Framework\Concerns\SplitKey;
-use PhpMvc\Framework\Data\Constants\QueryBuilderIndexes;
-use PhpMvc\Framework\Data\Constants\SelectQueryIndexes;
+use PhpMvc\Framework\Concerns\HasSplitKey;
+use PhpMvc\Framework\Data\Constants\OrderDirectionType;
+use PhpMvc\Framework\Data\Constants\QueryBuilderIndexType;
+use PhpMvc\Framework\Data\Constants\SelectQueryIndexType;
 
 class QueryBuilder
 {
     private array $query;
 
-    use SplitKey;
+    use HasSplitKey;
 
     /**
      * El constructor de QueryBuilder crea una propiedad privada $query donde el primer elemento
@@ -27,10 +28,10 @@ class QueryBuilder
     public function __construct(private Model $model)
     {
         $this->query = [
-            QueryBuilderIndexes::SqlStatement => array_fill(0, 6, ''),
-            QueryBuilderIndexes::WhereConditions => [],
-            QueryBuilderIndexes::JoinClauses => [],
-            QueryBuilderIndexes::OrderByClauses => []
+            QueryBuilderIndexType::SqlStatement => array_fill(0, 6, ''),
+            QueryBuilderIndexType::WhereConditions => [],
+            QueryBuilderIndexType::JoinClauses => [],
+            QueryBuilderIndexType::OrderByClauses => []
         ];
     }
 
@@ -85,72 +86,63 @@ class QueryBuilder
             $columns = implode(', ', $columns);
         }
 
-        $this->setSqlStatement(SelectQueryIndexes::Select, "SELECT {$columns}");
+        $this->setSqlStatement(SelectQueryIndexType::Select, "SELECT {$columns}");
 
         return $this;
     }
 
     public function from(): QueryBuilder
     {
-        $this->setSqlStatement(SelectQueryIndexes::From, "FROM {$this->getTableName()}");
+        $this->setSqlStatement(SelectQueryIndexType::From, "FROM {$this->getTableName()}");
 
         return $this;
     }
 
     public function where(array $conditions): QueryBuilder
     {
-        // if ($conditions === null) {
-        //     $conditions = array_flip($this->getPrimaryKey());
-        // }
-
         $whereClauses = array_map(fn($key) => "{$key} = :{$this->splitKey($key)}", array_keys($conditions));
-        // $whereClauses = array_map(function ($key) {
-        //     //$splittedKey = explode('.', $key);
-        //     $paramKey = $this->splitKey($key);
-        //     return "{$key} = :{$paramKey}";
-        // }, array_keys($conditions));
-        $whereConditions = $this->query[QueryBuilderIndexes::WhereConditions];
+        $whereConditions = $this->query[QueryBuilderIndexType::WhereConditions];
         $whereConditions = array_unique(array_merge($whereConditions, $whereClauses));
-        $this->query[QueryBuilderIndexes::WhereConditions] = $whereConditions;
+        $this->query[QueryBuilderIndexType::WhereConditions] = $whereConditions;
         $this->model->prepareParams($conditions);
 
         return $this;
     }
 
-    public function orderBy($column, $direction = 'ASC'): QueryBuilder
+    public function orderBy($column, $direction = OrderDirectionType::ASC): QueryBuilder
     {
-        $orderByClauses = $this->query[QueryBuilderIndexes::OrderByClauses];
+        $orderByClauses = $this->query[QueryBuilderIndexType::OrderByClauses];
         $orderByClauses = array_unique(array_merge($orderByClauses, ["{$column} {$direction}"]));
-        $this->query[QueryBuilderIndexes::OrderByClauses] = $orderByClauses;
+        $this->query[QueryBuilderIndexType::OrderByClauses] = $orderByClauses;
 
         return $this;
     }
 
     public function limit($limit, $offset = 0): QueryBuilder
     {
-        $this->setSqlStatement(SelectQueryIndexes::Limit, "LIMIT {$offset}, {$limit}");
+        $this->setSqlStatement(SelectQueryIndexType::Limit, "LIMIT {$offset}, {$limit}");
 
         return $this;
     }
 
     public function getQuery(): string
     {
-        $whereConditions = $this->query[QueryBuilderIndexes::WhereConditions];
+        $whereConditions = $this->query[QueryBuilderIndexType::WhereConditions];
 
         if (!empty($whereConditions)) {
-            $this->setSqlStatement(SelectQueryIndexes::Where, 'WHERE ' . implode(' AND ', $whereConditions));
+            $this->setSqlStatement(SelectQueryIndexType::Where, 'WHERE ' . implode(' AND ', $whereConditions));
         }
 
-        $joinClauses = $this->query[QueryBuilderIndexes::JoinClauses];
+        $joinClauses = $this->query[QueryBuilderIndexType::JoinClauses];
 
         if (!empty($joinClauses)) {
-            $this->setSqlStatement(SelectQueryIndexes::Join, implode(' ', $joinClauses));
+            $this->setSqlStatement(SelectQueryIndexType::Join, implode(' ', $joinClauses));
         }
 
-        $orderClauses = $this->query[QueryBuilderIndexes::OrderByClauses];
+        $orderClauses = $this->query[QueryBuilderIndexType::OrderByClauses];
 
         if (!empty($orderClauses)) {
-            $this->setSqlStatement(SelectQueryIndexes::OrderBy, implode(', ', $joinClauses));
+            $this->setSqlStatement(SelectQueryIndexType::OrderBy, "ORDER BY " . implode(', ', $orderClauses));
         }
 
         $query = trim(implode(' ', $this->query['SqlStatement']));
@@ -176,8 +168,8 @@ class QueryBuilder
         }
 
         if (!empty($joinClauses)) {
-            $queryJoinClauses = $this->query[QueryBuilderIndexes::JoinClauses];
-            $this->query[QueryBuilderIndexes::JoinClauses] = array_unique(array_merge($queryJoinClauses, $joinClauses));
+            $queryJoinClauses = $this->query[QueryBuilderIndexType::JoinClauses];
+            $this->query[QueryBuilderIndexType::JoinClauses] = array_unique(array_merge($queryJoinClauses, $joinClauses));
         }
 
         return $this;
@@ -187,7 +179,7 @@ class QueryBuilder
     #region Private Methods
     private function setSqlStatement($clause, $value)
     {
-        $this->query[QueryBuilderIndexes::SqlStatement][$clause] = $value;
+        $this->query[QueryBuilderIndexType::SqlStatement][$clause] = $value;
     }
 
     private function createForeignObject(array $relation): Model
