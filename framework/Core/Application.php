@@ -122,6 +122,11 @@ class Application
         return $this->authManager;
     }
 
+    public function getReactiveRoutes()
+    {
+        return $this->kernel->router->getReactiveRoutes();
+    }
+
     private function regexToTemplate(string $regex): string
     {
         $pattern = trim($regex, "#^$");

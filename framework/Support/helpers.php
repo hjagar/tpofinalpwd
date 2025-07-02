@@ -151,3 +151,32 @@ if (!function_exists('emailPattern')) {
         return "pattern=\"{$regex}\"";
     }
 }
+
+if (!function_exists('parseReactive')) {
+    /**
+     * Envuelve {0} o {algo} en un span reactivo.
+     *
+     * @param string $name  El texto original.
+     * @param string|null $htmlId  El ID para r-text, o null.
+     * @return string
+     */
+    function parseReactive(string $name, ?string $htmlId = null): string
+    {
+        $pattern = '/\{(.+?)\}/';
+
+        if (preg_match($pattern, $name)) {
+            return preg_replace_callback($pattern, function ($m) use ($htmlId) {
+                $id = $htmlId ?? '';
+                return "<span r-text=\"$id\">{$m[1]}</span>";
+            }, $name);
+        }
+
+        return $name;
+    }
+}
+
+if (!function_exists('reactiveRoutes')) {
+    function reactiveRoutes() {
+        return app()->getReactiveRoutes();
+    }
+}

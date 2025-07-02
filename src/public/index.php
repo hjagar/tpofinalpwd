@@ -42,8 +42,8 @@ $router->get('/my-purchases/{id}/show', [MyPurchasesController::class, 'show'])-
 
 // Rutas del carrito
 $router->get('/cart', [CartController::class, 'index'])->name('cart.index');
-$router->post('/cart/add/{id}', [CartController::class, 'add'])->name('cart.add');
-$router->post('/cart/remove/{id}', [CartController::class, 'remove'])->name('cart.remove');
+$router->get('/cart/add/{id}', [CartController::class, 'add'])->name('cart.add');
+$router->get('/cart/remove/{id}', [CartController::class, 'remove'])->name('cart.remove');
 
 // Rutas de contacto
 $router->get('/contact', [ContactController::class, 'index'])->name('contact.index');

@@ -97,6 +97,18 @@ class Router
         return $returnValue;
     }
 
+    public function getReactiveRoutes()
+    {
+        $routes = [...$this->routes['GET'], ...$this->routes['POST']];
+        $reactiveRoutes = array_reduce($routes, function ($carry, $route) {
+            $carry[$route->routeName] = $route->uri;
+            return $carry;
+        }, []);
+        $jsonRoutes = json_encode($reactiveRoutes);
+
+        return "window.ROUTES = {$jsonRoutes};";
+    }
+
     private function addRoute($method, $uri, $action)
     {
         [$regex, $paramNames] = $this->convertToRegex($uri);

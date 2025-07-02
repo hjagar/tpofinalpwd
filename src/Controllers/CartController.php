@@ -22,10 +22,10 @@ class CartController
      * @param int $productId
      * @return void
      */
-    public function add($productId)
+    public function add($id)
     {
-        $this->addToCart($productId);
-        return redirect('cart.index');
+        $this->addToCart($id);
+        redirect('cart.index');
     }
 
     /**
@@ -37,7 +37,7 @@ class CartController
     public function remove($productId)
     {
         $this->removeFromCart($productId);
-        return redirect('cart.index');
+        redirect('cart.index');
     }
 
     private function getCart()
