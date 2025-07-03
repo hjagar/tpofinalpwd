@@ -106,7 +106,6 @@ abstract class Model
     {
         $instance = new static();
         $queryBuilder = $instance->queryBuilder;
-        //$instance->params = $instance->prepareParams($id, $instance->getPrimaryKey());
         $conditions = array_combine($instance->getPrimaryKey(), $id);
         $query = $queryBuilder
             ->select()
@@ -430,16 +429,29 @@ abstract class Model
         return $this->getAffix($this->primaryKeySuffix);
     }
 
-    public function prepareParams(array $params, ?array $paramKeys = null): array
+    public function prepareParams(array $params/* , ?array $paramKeys = null */): array
     {
-        if ($paramKeys === null) {
-            $paramKeys = array_keys($params);
+        // if ($paramKeys === null) {
+        //     $paramKeys = array_keys($params);
+        // }
+
+        // $this->params = array_combine(
+        //     $this->makePlaceholders($paramKeys),
+        //     array_values($params)
+        // );
+
+
+        foreach ($params as $key => $value) {
+            if (is_array($value)) {
+                $range = range(1, count($value));
+                $keys = array_map(fn($r) => ":{$key}{$r}", $range);
+                $this->params = array_merge($this->params, array_combine($keys, $value));
+            } else {
+                $this->params[":{$key}"] = $value;
+            }
         }
 
-        $this->params = array_combine(
-            $this->makePlaceholders($paramKeys),
-            array_values($params)
-        );
+
 
         return $this->params;
     }
@@ -525,7 +537,8 @@ abstract class Model
         return $returnValue;
     }
 
-    private function whereClause() {
+    private function whereClause()
+    {
         $primaryKey = $this->getPrimaryKey();
         $whereClauses = array_map(fn($key) => "{$key} = :{$key}", $primaryKey);
 

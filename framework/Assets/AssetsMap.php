@@ -62,13 +62,6 @@ class AssetsMap
 
         $assets = $this->verifyAssets($assets);
 
-        // foreach ($assets as $asset) {
-        //     $assetName = $this->makeCamelCase($asset);
-
-        //     if (isset($this->$assetName)) {
-        //         $$assetsToRender[] = $this->$assetName->render();
-        //     }
-        // }
         foreach($assets as $asset) {
             $assetsToRender[] = $this->$asset->render();
         }

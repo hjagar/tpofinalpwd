@@ -2,62 +2,106 @@
 
 namespace App\Controllers;
 
+use App\Bussiness\Cart;
+use App\Bussiness\Product;
+use App\Models\Producto;
+
 class CartController
 {
-    /**
-     * Display the cart page.
-     *
-     * @return void
-     */
     public function index()
     {
         $cart = $this->getCart();
-        return view('cart.index', compact('cart'));
+        $productIds = $cart->getProductIds();
+        $productos = Producto::where(['idproducto' => $productIds])->get();
+
+        return view('cart.index', compact('productos'));
     }
 
+    public function indexAjax()
+    {
+        return view('cart.index-ajax');
+    }
 
-    /**
-     * Add a product to the cart.
-     *
-     * @param int $productId
-     * @return void
-     */
+    public function indexSsr() {
+        $cart = $this->getCart();
+        $productIds = $cart->getProductIds();
+        $productos = Producto::where(['idproducto' => $productIds])->get();
+        $products = [];
+        $itemCount = 0;
+        $total = 0;
+
+        foreach ($productos as $producto) {
+            $quantity = $cart->itemCount($producto->idproducto);
+            $product = new Product($producto->idproducto, $producto->nombre, $producto->precio, $quantity);
+            $itemCount += $quantity;
+            $total += $product->total();
+            $products[] = $product;
+        }
+
+        $data = json_encode(['products' => $products, 'itemCount' => $itemCount, 'total' => $total]);
+
+        return view('cart.index-ssr', compact('data'));
+    }
+
+    public function cart()
+    {
+        $cart = $this->getCart();
+        $productIds = $cart->getProductIds();
+        $productos = Producto::where(['idproducto' => $productIds])->get();
+        $products = [];
+        $itemCount = 0;
+        $total = 0;
+
+        foreach ($productos as $producto) {
+            $quantity = $cart->itemCount($producto->idproducto);
+            $product = new Product($producto->idproducto, $producto->nombre, $producto->precio, $quantity);
+            $itemCount += $quantity;
+            $total += $product->total();
+            $products[] = $product;
+        }
+
+        return json(['products' => $products, 'itemCount' => $itemCount, 'total' => $total]);
+    }
+
     public function add($id)
     {
         $this->addToCart($id);
-        redirect('cart.index');
+        $producto = Producto::find($id);
+
+        return json("Producto {$producto->nombre} agregado con exito");
     }
 
-    /**
-     * Remove a product from the cart.
-     *
-     * @param int $productId
-     * @return void
-     */
-    public function remove($productId)
+    public function remove($id)
     {
-        $this->removeFromCart($productId);
-        redirect('cart.index');
+        $this->removeFromCart($id);
+        $producto = Producto::find($id);
+        return json("Producto {$producto->nombre} removido con exito");
     }
 
-    private function getCart()
+    public function removeOne($id)
     {
-        // Aquí se implementaría la lógica para obtener el carrito del usuario
-        // Por ejemplo, desde la sesión o una base de datos
-        return $_SESSION['cart'] ?? [];
+        $this->removeOneFromCart($id);
+        $producto = Producto::find($id);
+        return json("Producto {$producto->nombre} removido con exito");
+    }
+
+    private function getCart(): Cart
+    {
+        return Cart::instance();
     }
 
     private function addToCart($productId)
     {
-        // Aquí se implementaría la lógica para agregar un producto al carrito
-        // Por ejemplo, agregarlo a la sesión o a una base de datos
-        $_SESSION['cart'][$productId] = ($_SESSION['cart'][$productId] ?? 0) + 1;
+        $this->getCart()->add($productId);
     }
 
     private function removeFromCart($productId)
     {
-        // Aquí se implementaría la lógica para eliminar un producto del carrito
-        // Por ejemplo, eliminarlo de la sesión o de una base de datos
-        unset($_SESSION['cart'][$productId]);
+        $this->getCart()->remove($productId);
+    }
+
+    private function removeOneFromCart($productId)
+    {
+        $this->getCart()->removeOne($productId);
     }
 }

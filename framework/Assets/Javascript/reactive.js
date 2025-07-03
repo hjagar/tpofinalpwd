@@ -65,7 +65,30 @@
 
         renderFor(el);
     }
-
+    /* Mantengo esto hasta testear la nueva version de renderFor
+        function renderFor(el) {
+            const key = el._r_for_key;
+            const itemName = el._r_for_item;
+            const placeholder = el._r_for_placeholder;
+            const parent = placeholder.parentNode;
+    
+            if (el._r_for_instances) {
+                el._r_for_instances.forEach(node => parent.removeChild(node));
+            }
+    
+            const list = state[key];
+            if (!Array.isArray(list)) return;
+    
+            el._r_for_instances = list.map(item => {
+                const clone = el._r_for_template.cloneNode(true); // /\{\{\s*(\w+)\s*\}\}/g
+                clone.innerHTML = clone.innerHTML.replace(/\[\[\s*(.*?)\s*\]\]/g, (_, v) => {
+                    return v === itemName ? item : '';
+                });
+                parent.insertBefore(clone, placeholder);
+                return clone;
+            });
+        }
+    */
     function renderFor(el) {
         const key = el._r_for_key;
         const itemName = el._r_for_item;
@@ -81,13 +104,33 @@
 
         el._r_for_instances = list.map(item => {
             const clone = el._r_for_template.cloneNode(true);
-            clone.innerHTML = clone.innerHTML.replace(/\{\{\s*(\w+)\s*\}\}/g, (_, v) => {
-                return v === itemName ? item : '';
+
+            // Reemplazo [[ ]]
+            clone.innerHTML = clone.innerHTML.replace(/\[\[\s*(.*?)\s*\]\]/g, (_, expr) => {
+                const fn = new Function(itemName, `return ${expr}`);
+                return fn(item);
             });
+
+            // Bind inputs con r-model="item.prop"
+            clone.querySelectorAll('[r-model]').forEach(input => {
+                const path = input.getAttribute('r-model').split('.');
+                if (path.length !== 2 || path[0] !== itemName) return;
+
+                const prop = path[1];
+                input.value = item[prop];
+                input.addEventListener('input', e => {
+                    item[prop] = Number(e.target.value);
+                    // Forzar rerender de la lista entera
+                    state[key] = [...list];
+                    updateBindings(key);
+                });
+            });
+
             parent.insertBefore(clone, placeholder);
             return clone;
         });
     }
+
 
     function updateBindings(key) {
         document.querySelectorAll(`[r-text="${key}"]`).forEach(el => {

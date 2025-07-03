@@ -36,6 +36,14 @@ if (!function_exists('view')) {
     }
 }
 
+if(!function_exists('json')) {
+    function json(mixed $data) {
+        return [
+            'data' => $data
+        ];
+    }
+}
+
 if (!function_exists('auth')) {
     function auth()
     {

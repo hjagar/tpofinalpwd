@@ -100,7 +100,17 @@ class QueryBuilder
 
     public function where(array $conditions): QueryBuilder
     {
-        $whereClauses = array_map(fn($key) => "{$key} = :{$this->splitKey($key)}", array_keys($conditions));
+        //$whereClauses = array_map(fn($key) => "{$key} = :{$this->splitKey($key)}", array_keys($conditions));
+        $whereClauses = array_map(function ($key, $value) {
+            if (is_array($value)) {
+                $range = range(1, count($value));
+                $in = implode(',', array_map(fn($i) => ":{$this->splitKey($key)}{$i}", $range));
+
+                return "{$key} IN ({$in})";
+            } else {
+                return "{$key} = :{$this->splitKey($key)}";
+            }
+        }, array_keys($conditions), array_values($conditions));
         $whereConditions = $this->query[QueryBuilderIndexType::WhereConditions];
         $whereConditions = array_unique(array_merge($whereConditions, $whereClauses));
         $this->query[QueryBuilderIndexType::WhereConditions] = $whereConditions;

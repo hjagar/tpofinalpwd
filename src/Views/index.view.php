@@ -27,12 +27,16 @@
     document.addEventListener('DOMContentLoaded', function() {
       reactive.init({
         state: {
-          itemCount: 0
+          itemCount: parseInt('{!! $cart->count() !!}')
         },
         scope: {
           async addToCart(id) {
             const response = await http.get(route('cart.add', {id}));
-            reactive.setState('itemCount', reactive.state.itemCount + 1);
+            
+            if (response.status === http.status.ok) {
+              // TODO:  show toast con el mensaje
+              reactive.setState('itemCount', reactive.state.itemCount + 1);              
+            }
           }
         }
       });

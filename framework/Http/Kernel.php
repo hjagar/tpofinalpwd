@@ -5,6 +5,7 @@ namespace PhpMvc\Framework\Http;
 use Closure;
 use PhpMvc\Framework\Core\Application;
 use Exception;
+use PhpMvc\Framework\Http\Constants\RouteProduceType;
 use PhpMvc\Framework\Http\Middleware\CsrfMiddleware;
 use PhpMvc\Framework\Http\Middleware\StartSessionMiddleware;
 
@@ -13,8 +14,7 @@ class Kernel
     private array $middlewareGroups = [
         'web' => [
             StartSessionMiddleware::class,
-            CsrfMiddleware::class,
-            // AuthMiddleware::class,
+            CsrfMiddleware::class
         ]
     ];
 
@@ -31,18 +31,21 @@ class Kernel
         $middlewares = $this->middlewareGroups[$group] ?? [];
         $middlewares = array_merge($middlewares, $route->middlewares);
 
-        $content = $this->handleMiddlewareChain($middlewares, $request, function ($request) use ($uri, $method) {
+        $result = $this->handleMiddlewareChain($middlewares, $request, function ($request) use ($uri, $method) {
             return $this->router->dispatch($uri, $method, $request);
         });
 
-        $response = new Response($content, HttpStatus::OK->value, [
-            'Content-Type' => 'text/html; charset=UTF-8',
-            'X-Powered-By' => Application::NAME,
-            'X-Version' => Application::VERSION,
-            'X-Author' => Application::AUTHOR,
-        ]);
+        if ($result instanceof Response) {
+            return $result;
+        } else {
+            if ($route->produces === RouteProduceType::JSON || is_array($result) || is_object($result)) {
+                $responseClass = JsonResponse::class;
+            } else {
+                $responseClass = Response::class;
+            }
 
-        return $response;
+            return new $responseClass($result, HttpStatus::OK->value);
+        }
     }
 
     public function __get($name)
