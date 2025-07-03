@@ -5,6 +5,7 @@ namespace App\Controllers;
 use App\Bussiness\Cart;
 use App\Bussiness\Product;
 use App\Models\Producto;
+use PhpMvc\Framework\Http\Request;
 
 class CartController
 {
@@ -22,7 +23,8 @@ class CartController
         return view('cart.index-ajax');
     }
 
-    public function indexSsr() {
+    public function indexSsr()
+    {
         $cart = $this->getCart();
         $productIds = $cart->getProductIds();
         $productos = Producto::where(['idproducto' => $productIds])->get();
@@ -43,7 +45,7 @@ class CartController
         return view('cart.index-ssr', compact('data'));
     }
 
-    public function cart()
+    public function cartProducts()
     {
         $cart = $this->getCart();
         $productIds = $cart->getProductIds();
@@ -83,6 +85,11 @@ class CartController
         $this->removeOneFromCart($id);
         $producto = Producto::find($id);
         return json("Producto {$producto->nombre} removido con exito");
+    }
+
+    public function buy(Request $request)
+    {
+        // TODO: hacer la compra acá
     }
 
     private function getCart(): Cart

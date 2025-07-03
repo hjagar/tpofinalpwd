@@ -1,5 +1,7 @@
+"use strict";
 (function(window) {
   const http = (() => {
+    const version = '1.0';
     const request = async (method, url, data = null, headers = {}) => {
       const options = {
         method: method.toUpperCase(),
@@ -58,7 +60,8 @@
       post: (url, data, headers = {}) => request('POST', url, data, headers),
       put: (url, data, headers = {}) => request('PUT', url, data, headers),
       del: (url, headers = {}) => request('DELETE', url, null, headers),
-      status: httpStatus
+      status: httpStatus,
+      version
     };
   })();
 
