@@ -4,11 +4,24 @@ namespace App\Controllers;
 
 use App\Bussiness\Cart;
 use App\Bussiness\Product;
+use App\Models\Compra;
+use App\Models\CompraEstado;
+use App\Models\CompraEstadoTipo;
+use App\Models\CompraItem;
 use App\Models\Producto;
+use PhpMvc\Framework\Http\JsonResult;
 use PhpMvc\Framework\Http\Request;
+use PhpMvc\Framework\Mail\EmailSender;
+use PhpMvc\Framework\Mail\TemplateCompiler;
 
 class CartController
 {
+    private EmailSender $emailSender;
+
+    public function __construct()
+    {
+        $this->emailSender = new EmailSender();
+    }
     public function index()
     {
         $cart = $this->getCart();
@@ -67,29 +80,135 @@ class CartController
 
     public function add($id)
     {
-        $this->addToCart($id);
         $producto = Producto::find($id);
+        $returnValue = new JsonResult();
 
-        return json("Producto {$producto->nombre} agregado con exito");
+        if ($producto !== null) {
+            $stock = intval($producto->stock);
+
+            if ($stock) {
+                $this->addToCart($id);
+                $producto->stock = $stock - 1;
+                $producto->save();
+                $returnValue->message = "Producto {$producto->nombre} agregado con exito";
+            } else {
+                $returnValue->success = false;
+                $returnValue->message = "Producto {$producto->nombre} no cuenta con stock";
+            }
+        } else {
+            $returnValue->success = false;
+            $returnValue->message = "Producto no encontrado";
+        }
+
+        return json($returnValue);
     }
 
     public function remove($id)
     {
-        $this->removeFromCart($id);
         $producto = Producto::find($id);
-        return json("Producto {$producto->nombre} removido con exito");
+        $returnValue = new JsonResult();
+
+        if ($producto !== null) {
+            $stockRemoved = $this->removeFromCart($id);
+            $stock = intval($producto->stock);
+            $producto->stock = $stock + $stockRemoved;
+            $producto->save();
+            $returnValue->message = "Producto {$producto->nombre} removido con exito";
+            $returnValue->countRemoved = $stockRemoved;
+        } else {
+            $returnValue->success = false;
+            $returnValue->message = "Producto no encontrado";
+        }
+
+        return json($returnValue);
     }
 
     public function removeOne($id)
     {
-        $this->removeOneFromCart($id);
+
         $producto = Producto::find($id);
-        return json("Producto {$producto->nombre} removido con exito");
+        $returnValue = new JsonResult();
+
+        if ($producto !== null) {
+            $stockRemoved = $this->removeOneFromCart($id);
+            $stock = intval($producto->stock);
+            $producto->stock = $stock + $stockRemoved;
+            $producto->save();
+            $returnValue->message = "Producto {$producto->nombre} removido con exito";
+        } else {
+            $returnValue->success = false;
+            $returnValue->message = "Producto no encontrado";
+        }
+
+        return json($returnValue);
+    }
+
+    public function update(Request $request)
+    {
+        $id = $request->id;
+        $producto = Producto::find($id);
+        $returnValue = new JsonResult();
+
+        if ($producto !== null) {
+            $quantity = $request->quantity;
+            $currentCount =  $this->updateOne($id, $quantity);
+            $stock = intval($producto->stock);
+            $producto->stock = $stock + $currentCount;
+            $producto->save();
+            $returnValue->message = "Producto {$producto->nombre} actualizado con exito";
+        } else {
+            $returnValue->success = false;
+            $returnValue->message = "Producto no encontrado";
+        }
+
+        return json($returnValue);
     }
 
     public function buy(Request $request)
     {
-        // TODO: hacer la compra acá
+        $now = time();
+        $todayData = date('Y-m-d H:i:s', $now);
+        $todayEmail = date('d/m/Y', $now);
+        // Guardo la compra
+        $compra = new Compra();
+        $user = auth()->user();
+        $compra->idusuario = $user->idusuario;
+        $compra->fecha = $todayData;
+        $compra->save();
+        $idcompra = $compra->idcompra;
+
+        // Guardo los items
+        $items = $request->items;
+        foreach ($items as $item) {
+            $compraItem = new CompraItem();
+            $compraItem->idproducto = $item->idproducto;
+            $compraItem->idcompra = $idcompra;
+            $compraItem->cantidad = $item->cantidad;
+            $compraItem->save();
+        }
+        // Guardo el estado inicial
+        $estado = 'iniciada';
+        $compraEtadoTipo = CompraEstadoTipo::where(['nombre' => $estado])->first();
+
+        $compraEstado = new CompraEstado();
+        $compraEstado->idcompra = $idcompra;
+        $compraEstado->idcomraestadotipo = $compraEtadoTipo->idcompraestadotipo;
+        $compraEstado->fecha = $todayData;
+        $compraEstado->save();
+
+        // Envío email
+        $template = "admin.sales.templates.{$estado}";
+        $templateCompiler = new TemplateCompiler($template);
+        $data = [
+            'nombre' => $user->usuario,
+            'estado' => $estado,
+            'fecha' => $todayEmail,
+            'appName' => env('APP_NAME')
+        ];
+        $emailBody = $templateCompiler->render($data);
+        $this->emailSender->send($user->email, 'Actualización de estado de compra', $emailBody, true);
+        // Devolver JsonResult
+        return json(new JsonResult(true, "Compra realizada con exito"));
     }
 
     private function getCart(): Cart
@@ -102,13 +221,18 @@ class CartController
         $this->getCart()->add($productId);
     }
 
-    private function removeFromCart($productId)
+    private function removeFromCart($productId): int
     {
-        $this->getCart()->remove($productId);
+        return $this->getCart()->remove($productId);
     }
 
-    private function removeOneFromCart($productId)
+    private function removeOneFromCart($productId): int
     {
-        $this->getCart()->removeOne($productId);
+        return $this->getCart()->removeOne($productId);
+    }
+
+    private function updateOne($productId, $cantidad)
+    {
+        $this->getCart()->update($productId, $cantidad);
     }
 }

@@ -8,7 +8,7 @@ Carrito de Compras
   <div class="col-12 col-md-8 col-lg-6">
     <div class="card shadow-sm">
       <div class="card-body">
-        <div r-html="message"></div>
+        <div r-show="showMessage"><span r-text="message"></span></div>
         <ul r-show="itemCount" class="list-group">
           <li r-for="product in products" class="list-group-item d-flex justify-content-between align-items-center">
             <div>
@@ -36,6 +36,20 @@ Carrito de Compras
 
 @section('javascript')
 <script>
+  function showMessage(message) {
+    reactive.setState('message', message);
+    reactive.setState('showMessage', true);
+    setTimeout(reactive.setState('showMessage', false), 3000);
+  }
+
+  function calculateTotal() {
+    const products = reactive.state.products;
+    const itemCount = products.reduce((sum, p) => sum + p.quantity, 0);
+    const total = products.reduce((sum, p) => sum + p.price * p.quantity, 0);
+    reactive.setState('itemCount', itemCount);
+    reactive.setState('total', total);
+  }
+
   document.addEventListener('DOMContentLoaded', async function() {
     const response = await http.get(route('cart.products'));
     const responseData = JSON.parse(response.content);
@@ -50,35 +64,79 @@ Carrito de Compras
       state: {
         itemCount,
         products,
-        total
+        total,
+        showMessage: false,
+        message: ''
       },
       scope: {
-        async addToCart(id) {
-          const response = await http.get(route('cart.add', {
+        async remove(id) {
+          const response = await http.post(route('cart.remove'), {
             id
-          }));
-
+          });
           if (response.status === http.status.ok) {
-            // TODO:  show toast con el mensaje
-            reactive.setState('itemCount', reactive.state.itemCount + 1);
+            const responseData = JSON.parse(response.content);
+            const {
+              data: {
+                success,
+                message,
+                properties
+              }
+            } = responseData;
+            showMessage(message);
+
+            if (success) {
+              const products = reactive.state.products;
+              const filteredProducts = products.filter(product => product.id !== id);
+              reactive.setState('products', filteredProducts);
+              calculateTotal();
+            }
           }
         },
-        async remove(id) {
-          // TODO: hacer llamada al backend
-          reactive.setState('itemCount', reactive.state.itemCount - 1);
-        },
         async buy() {
+          const products = reactive.state.products;
+          const body = {
+            items: products
+          };
+          const response = await http.post(route('cart.buy'), body);
 
+          if (response.status === http.status.ok) {
+            const responseData = JSON.parse(response.content);
+            const {
+              data: {
+                success,
+                message
+              }
+            } = responseData;
+            showMessage(message);
+            setTimeout(redirect('home.index'), 3000);
+          }
         },
-        onQuantityChange(product) {
-          product.total = product.price * product.quantity;
-          const products = reactive.state.products;                   
-          const itemCount = products.reduce((sum, p) => sum + p.quantity, 0);
-          const total = products.reduce((sum, p) => sum + p.price * p.quantity, 0);
-          //reactive.setState('products', [...products]);
-          reactive.updateItemBindings();
-          reactive.setState('itemCount', itemCount);
-          reactive.setState('total', total);
+        async onQuantityChange(product) {
+          const response = await http.post(route('cart.update'), {
+            product
+          });
+
+          if (response.status === http.status.ok) {
+            const responseData = JSON.parse(response.content);
+            const {
+              data: {
+                success,
+                message
+              }
+            } = responseData;
+            showMessage(message);
+
+            if (success) {
+              product.total = product.price * product.quantity;
+              reactive.updateItemBindings();
+              calculateTotal();
+              // const products = reactive.state.products;
+              // const itemCount = products.reduce((sum, p) => sum + p.quantity, 0);
+              // const total = products.reduce((sum, p) => sum + p.price * p.quantity, 0);
+              // reactive.setState('itemCount', itemCount);
+              // reactive.setState('total', total);
+            }
+          }
         },
       }
     });
