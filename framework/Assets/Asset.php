@@ -27,6 +27,10 @@ class Asset
             if ($prop === 'source' && str_starts_with($val, 'http')) {
                 $this->attributes['origin'] = AssetType::REMOTE;
             }
+
+            if ($prop === 'type' && $val === AssetType::DYNAMICJS){
+                $this->attributes['origin'] = AssetType::DYNAMICJS;
+            }
         }
 
         if ($this->attributes['origin'] === AssetType::LOCAL) {
@@ -68,6 +72,7 @@ class Asset
 
         $returnValue = match ($this->type) {
             AssetType::JS => "<script src=\"{$assetUrl}\" defer{$properties}></script>" . PHP_EOL,
+            AssetType::DYNAMICJS => "<script src=\"{$assetUrl}\" defer{$properties}></script>" . PHP_EOL,
             AssetType::CSS => "<link href=\"{$assetUrl}\" rel=\"stylesheet\"{$properties}>" . PHP_EOL,
             default => ""
         };
@@ -84,6 +89,7 @@ class Asset
                 $returnValue = match ($this->origin) {
                     AssetType::LOCAL => $this->verifyAssetMd5Local(),
                     AssetType::REMOTE => $this->verifyAssetMd5Remote(),
+                    AssetType::DYNAMICJS => $this->verifyAssetMd5Dynamic(),
                     default => false
                 };
             } else {
@@ -106,6 +112,10 @@ class Asset
                 break;
             case AssetType::REMOTE:
                 $assetContent = file_get_contents($this->source);
+                file_put_contents($assetPathDest, $assetContent);
+                break;
+            case AssetType::DYNAMICJS:                
+                $assetContent = $this->getAssetDynamicContent();
                 file_put_contents($assetPathDest, $assetContent);
                 break;
         }
@@ -151,7 +161,7 @@ class Asset
         return $returnValue;
     }
 
-    private function verifyAssetMd5Local()
+    private function verifyAssetMd5Local(): bool
     {
         $assetFramework = $this->getAssetFrameworkPath();
         $assetPath = $this->getAssetPath();
@@ -159,12 +169,27 @@ class Asset
         return md5_file($assetFramework) !== md5_file($assetPath);
     }
 
-    private function verifyAssetMd5Remote()
+    private function verifyAssetMd5Remote(): bool
     {
         $assetPath = $this->getAssetPath();
         $assetRemoteContent = file_get_contents($this->source);
         $assetLocalContent = file_get_contents($assetPath);
 
         return md5($assetRemoteContent) !== md5($assetLocalContent);
+    }
+
+    private function verifyAssetMd5Dynamic(): bool {
+        $assetPath = $this->getAssetPath();
+        $assetRemoteContent = $this->getAssetDynamicContent();
+        $assetLocalContent = file_get_contents($assetPath);
+
+        return md5($assetRemoteContent) !== md5($assetLocalContent);
+    }
+
+    private function getAssetDynamicContent() {
+        $helper = $this->source;
+        $assetContent = $helper();
+
+        return $assetContent;
     }
 }

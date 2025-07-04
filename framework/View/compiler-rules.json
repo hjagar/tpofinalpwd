@@ -23,6 +23,7 @@
         "csrf": "<?php echo csrf(); ?>",
         "assets": "<?php echo $env->assets(expr); ?>",
         "emailPattern": "<?php echo emailPattern(); ?>",
-        "selected": "<?php echo ((expr) ? 'selected' : ''); ?>"
+        "selected": "<?php echo ((expr) ? 'selected' : ''); ?>",
+        "reactiveRoutes": "<?php echo reactiveRoutes(); ?>"
     }
 }

@@ -5,7 +5,6 @@
 <body>
     <header>
         @include('partials.logo')
-        @include('partials.search')
         @include('partials.header-menu')
     </header>
     @include('partials.main-menu')

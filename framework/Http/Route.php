@@ -7,6 +7,7 @@ use Exception;
 class Route
 {
     private ?string $routeName = null;
+    public ?string $produces = null;
     private ?string $middlewareGroupName = null;
     private array $middlewares = [];
 
@@ -39,6 +40,12 @@ class Route
         return $this;
     }
 
+    public function produces(string $type): self
+    {
+        $this->produces = $type;
+        return $this;
+    }
+    
     public function middlewareGroup($middlewareGroupName)
     {
         $this->middlewareGroupName = $middlewareGroupName;
@@ -46,17 +53,20 @@ class Route
         return $this;
     }
 
-    public function middleware(string $middleware) {
+    public function middleware(string $middleware)
+    {
         $this->middlewares[] = $middleware;
-  
+
         return $this;
     }
 
-    public function getMiddlewareGroup() {
+    public function getMiddlewareGroup()
+    {
         return $this->middlewareGroupName;
     }
 
-    public function getMiddlewares() {
+    public function getMiddlewares()
+    {
         return $this->middlewares;
     }
 }

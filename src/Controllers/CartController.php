@@ -2,62 +2,237 @@
 
 namespace App\Controllers;
 
+use App\Bussiness\Cart;
+use App\Bussiness\Product;
+use App\Models\Compra;
+use App\Models\CompraEstado;
+use App\Models\CompraEstadoTipo;
+use App\Models\CompraItem;
+use App\Models\Producto;
+use PhpMvc\Framework\Http\JsonResult;
+use PhpMvc\Framework\Http\Request;
+use PhpMvc\Framework\Mail\EmailSender;
+use PhpMvc\Framework\Mail\TemplateCompiler;
+
 class CartController
 {
-    /**
-     * Display the cart page.
-     *
-     * @return void
-     */
+    private EmailSender $emailSender;
+
+    public function __construct()
+    {
+        $this->emailSender = new EmailSender();
+    }
     public function index()
     {
         $cart = $this->getCart();
-        return view('cart.index', compact('cart'));
+        $productIds = $cart->getProductIds();
+        $productos = Producto::where(['idproducto' => $productIds])->get();
+
+        return view('cart.index', compact('productos'));
     }
 
-
-    /**
-     * Add a product to the cart.
-     *
-     * @param int $productId
-     * @return void
-     */
-    public function add($productId)
+    public function indexAjax()
     {
-        $this->addToCart($productId);
-        return redirect('cart.index');
+        return view('cart.index-ajax');
     }
 
-    /**
-     * Remove a product from the cart.
-     *
-     * @param int $productId
-     * @return void
-     */
-    public function remove($productId)
+    public function indexSsr()
     {
-        $this->removeFromCart($productId);
-        return redirect('cart.index');
+        $cart = $this->getCart();
+        $productIds = $cart->getProductIds();
+        $productos = Producto::where(['idproducto' => $productIds])->get();
+        $products = [];
+        $itemCount = 0;
+        $total = 0;
+
+        foreach ($productos as $producto) {
+            $quantity = $cart->itemCount($producto->idproducto);
+            $product = new Product($producto->idproducto, $producto->nombre, $producto->precio, $quantity);
+            $itemCount += $quantity;
+            $total += $product->total();
+            $products[] = $product;
+        }
+
+        $data = json_encode(['products' => $products, 'itemCount' => $itemCount, 'total' => $total]);
+
+        return view('cart.index-ssr', compact('data'));
     }
 
-    private function getCart()
+    public function cartProducts()
     {
-        // Aquí se implementaría la lógica para obtener el carrito del usuario
-        // Por ejemplo, desde la sesión o una base de datos
-        return $_SESSION['cart'] ?? [];
+        $cart = $this->getCart();
+        $productIds = $cart->getProductIds();
+        $productos = Producto::where(['idproducto' => $productIds])->get();
+        $products = [];
+        $itemCount = 0;
+        $total = 0;
+
+        foreach ($productos as $producto) {
+            $quantity = $cart->itemCount($producto->idproducto);
+            $product = new Product($producto->idproducto, $producto->nombre, $producto->precio, $quantity);
+            $itemCount += $quantity;
+            $total += $product->total();
+            $products[] = $product;
+        }
+
+        return json(['products' => $products, 'itemCount' => $itemCount, 'total' => $total]);
+    }
+
+    public function add($id)
+    {
+        $producto = Producto::find($id);
+        $returnValue = new JsonResult();
+
+        if ($producto !== null) {
+            $stock = intval($producto->stock);
+
+            if ($stock) {
+                $this->addToCart($id);
+                $producto->stock = $stock - 1;
+                $producto->save();
+                $returnValue->message = "Producto {$producto->nombre} agregado con exito";
+            } else {
+                $returnValue->success = false;
+                $returnValue->message = "Producto {$producto->nombre} no cuenta con stock";
+            }
+        } else {
+            $returnValue->success = false;
+            $returnValue->message = "Producto no encontrado";
+        }
+
+        return json($returnValue);
+    }
+
+    public function remove($id)
+    {
+        $producto = Producto::find($id);
+        $returnValue = new JsonResult();
+
+        if ($producto !== null) {
+            $stockRemoved = $this->removeFromCart($id);
+            $stock = intval($producto->stock);
+            $producto->stock = $stock + $stockRemoved;
+            $producto->save();
+            $returnValue->message = "Producto {$producto->nombre} removido con exito";
+            $returnValue->countRemoved = $stockRemoved;
+        } else {
+            $returnValue->success = false;
+            $returnValue->message = "Producto no encontrado";
+        }
+
+        return json($returnValue);
+    }
+
+    public function removeOne($id)
+    {
+
+        $producto = Producto::find($id);
+        $returnValue = new JsonResult();
+
+        if ($producto !== null) {
+            $stockRemoved = $this->removeOneFromCart($id);
+            $stock = intval($producto->stock);
+            $producto->stock = $stock + $stockRemoved;
+            $producto->save();
+            $returnValue->message = "Producto {$producto->nombre} removido con exito";
+        } else {
+            $returnValue->success = false;
+            $returnValue->message = "Producto no encontrado";
+        }
+
+        return json($returnValue);
+    }
+
+    public function update(Request $request)
+    {
+        $id = $request->id;
+        $producto = Producto::find($id);
+        $returnValue = new JsonResult();
+
+        if ($producto !== null) {
+            $quantity = $request->quantity;
+            $currentCount =  $this->updateOne($id, $quantity);
+            $stock = intval($producto->stock);
+            $producto->stock = $stock + $currentCount;
+            $producto->save();
+            $returnValue->message = "Producto {$producto->nombre} actualizado con exito";
+        } else {
+            $returnValue->success = false;
+            $returnValue->message = "Producto no encontrado";
+        }
+
+        return json($returnValue);
+    }
+
+    public function buy(Request $request)
+    {
+        $now = time();
+        $todayData = date('Y-m-d H:i:s', $now);
+        $todayEmail = date('d/m/Y', $now);
+        // Guardo la compra
+        $compra = new Compra();
+        $user = auth()->user();
+        $compra->idusuario = $user->idusuario;
+        $compra->fecha = $todayData;
+        $compra->save();
+        $idcompra = $compra->idcompra;
+
+        // Guardo los items
+        $items = $request->items;
+        foreach ($items as $item) {
+            $compraItem = new CompraItem();
+            $compraItem->idproducto = $item->idproducto;
+            $compraItem->idcompra = $idcompra;
+            $compraItem->cantidad = $item->cantidad;
+            $compraItem->save();
+        }
+        // Guardo el estado inicial
+        $estado = 'iniciada';
+        $compraEtadoTipo = CompraEstadoTipo::where(['nombre' => $estado])->first();
+
+        $compraEstado = new CompraEstado();
+        $compraEstado->idcompra = $idcompra;
+        $compraEstado->idcomraestadotipo = $compraEtadoTipo->idcompraestadotipo;
+        $compraEstado->fecha = $todayData;
+        $compraEstado->save();
+
+        // Envío email
+        $template = "admin.sales.templates.{$estado}";
+        $templateCompiler = new TemplateCompiler($template);
+        $data = [
+            'nombre' => $user->usuario,
+            'estado' => $estado,
+            'fecha' => $todayEmail,
+            'appName' => env('APP_NAME')
+        ];
+        $emailBody = $templateCompiler->render($data);
+        $this->emailSender->send($user->email, 'Actualización de estado de compra', $emailBody, true);
+        // Devolver JsonResult
+        return json(new JsonResult(true, "Compra realizada con exito"));
+    }
+
+    private function getCart(): Cart
+    {
+        return Cart::instance();
     }
 
     private function addToCart($productId)
     {
-        // Aquí se implementaría la lógica para agregar un producto al carrito
-        // Por ejemplo, agregarlo a la sesión o a una base de datos
-        $_SESSION['cart'][$productId] = ($_SESSION['cart'][$productId] ?? 0) + 1;
+        $this->getCart()->add($productId);
     }
 
-    private function removeFromCart($productId)
+    private function removeFromCart($productId): int
     {
-        // Aquí se implementaría la lógica para eliminar un producto del carrito
-        // Por ejemplo, eliminarlo de la sesión o de una base de datos
-        unset($_SESSION['cart'][$productId]);
+        return $this->getCart()->remove($productId);
+    }
+
+    private function removeOneFromCart($productId): int
+    {
+        return $this->getCart()->removeOne($productId);
+    }
+
+    private function updateOne($productId, $cantidad)
+    {
+        $this->getCart()->update($productId, $cantidad);
     }
 }

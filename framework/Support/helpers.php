@@ -36,6 +36,14 @@ if (!function_exists('view')) {
     }
 }
 
+if(!function_exists('json')) {
+    function json(mixed $data) {
+        return [
+            'data' => $data
+        ];
+    }
+}
+
 if (!function_exists('auth')) {
     function auth()
     {
@@ -149,5 +157,34 @@ if (!function_exists('emailPattern')) {
     function emailPattern() {
         $regex = '/[a-zA-Z0-9!#$%&\'*\/=?^_`\{\|\}~\+\-]([\.]?[a-zA-Z0-9!#$%&\'*\/=?^_`\{\|\}~\+\-])+@[a-zA-Z0-9]([^@&%$\/\(\)=?¿!\.,:;]|\d)+[a-zA-Z0-9][\.][a-zA-Z]{2,4}([\.][a-zA-Z]{2})?/m';
         return "pattern=\"{$regex}\"";
+    }
+}
+
+if (!function_exists('parseReactive')) {
+    /**
+     * Envuelve {0} o {algo} en un span reactivo.
+     *
+     * @param string $name  El texto original.
+     * @param string|null $htmlId  El ID para r-text, o null.
+     * @return string
+     */
+    function parseReactive(string $name, ?string $htmlId = null): string
+    {
+        $pattern = '/\{(.+?)\}/';
+
+        if (preg_match($pattern, $name)) {
+            return preg_replace_callback($pattern, function ($m) use ($htmlId) {
+                $id = $htmlId ?? '';
+                return "<span r-text=\"$id\">{$m[1]}</span>";
+            }, $name);
+        }
+
+        return $name;
+    }
+}
+
+if (!function_exists('reactiveRoutes')) {
+    function reactiveRoutes() {
+        return app()->getReactiveRoutes();
     }
 }

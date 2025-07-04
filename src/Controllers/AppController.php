@@ -2,6 +2,7 @@
 
 namespace App\Controllers;
 
+use App\Bussiness\Cart;
 use App\Models\Menu;
 use PhpMvc\Framework\View\ViewComposer;
 
@@ -10,6 +11,15 @@ class AppController
     public function boot()
     {
         $headerMenu = Menu::rawQueryAll('sqlMenusByName', ['Header', 'Header']);
+        $mainMenu = $this->getMainMenu();
+        $cart = Cart::instance();
+        ViewComposer::share('headerMenu', $headerMenu);
+        ViewComposer::share('mainMenu', $mainMenu);
+        ViewComposer::share('cart', $cart);
+    }
+
+    private function getMainMenu()
+    {
         $mainMenu = Menu::rawQueryAll('sqlMenusByName', ['Main', 'Main']);
         $mainMenuItemIds = array_map(fn($item) => $item->idmenu, $mainMenu);
         $mainMenuFinal = [];
@@ -29,7 +39,6 @@ class AppController
             }
         }
 
-        ViewComposer::share('headerMenu', $headerMenu);
-        ViewComposer::share('mainMenu', $mainMenuFinal);
+        return $mainMenuFinal;
     }
 }

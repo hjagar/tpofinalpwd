@@ -8,24 +8,25 @@
     <div class="col-12 col-md-8 col-lg-6">
       <div class="card shadow-sm">
         <div class="card-body">
-          @if (count($cart) > 0)
+          @if ($cart->count() > 0)
             <ul class="list-group">
-              @foreach ($cart as $item)
+              @foreach ($productos as $item)
                 <li class="list-group-item d-flex justify-content-between align-items-center">
                   <div>
-                    <strong>{{ $item->product_name }}</strong><br>
-                    Cantidad: {{ $item->quantity }}<br>
-                    Precio: ${{ number_format($item->price, 2) }}
+                    <strong>{{ $item->nombre }}</strong><br>
+                    Cantidad: {{ $cart->itemCount($item->idproducto) }}<br>
+                    Precio: ${{ number_format($item->precio, 2, ',', '.') }}<br>
+                    Total: ${{ number_format($item->precio * $cart->itemCount($item->idproducto), 2, ',', '.') }}
                   </div>
-                  <form action="{{ route('cart.remove', [$item->id]) }}" method="POST" class="d-inline">
+                  <form action="{{ route('cart.remove', [$item->idproducto]) }}" method="POST" class="d-inline">
                     @csrf
-                    <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
+                    <button type="submit" class="btn btn-danger btn-sm">⊘</button>
                   </form>
                 </li>
               @endforeach
             </ul>
-            <div class="mt-3">
-              <strong>Total: ${{ number_format($cart->sum('price'), 2) }}</strong>
+            <div class="d-flex justify-content-end mt-3">
+              <strong>Total: ${{ number_format($item->precio, 2, ',', '.') }}</strong>
             </div>
             <div class="d-flex justify-content-end mt-3">
               <form action="{{ route('cart.checkout') }}" method="POST" class="d-inline">

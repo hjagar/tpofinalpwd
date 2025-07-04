@@ -60,12 +60,10 @@ class AssetsMap
     {
         $assetsToRender = [];
 
-        foreach ($assets as $asset) {
-            $assetName = $this->makeCamelCase($asset);
+        $assets = $this->verifyAssets($assets);
 
-            if (isset($this->$assetName)) {
-                $assetsToRender[] = $this->$assetName->render();
-            }
+        foreach($assets as $asset) {
+            $assetsToRender[] = $this->$asset->render();
         }
 
         return implode(PHP_EOL, $assetsToRender);
@@ -78,5 +76,24 @@ class AssetsMap
             fn($m) => strtoupper($m[1]),
             $string
         );
+    }
+
+    private function verifyAssets($assets): array
+    {
+        $returnValue = [];
+
+        foreach ($assets as $asset) {
+            $assetName = $this->makeCamelCase($asset);
+
+            if (isset($this->$assetName)) {
+                $returnValue[] = $assetName;
+
+                if (isset($this->$assetName->includes)){
+                    $returnValue = array_merge($returnValue, $this->$assetName->includes);
+                }
+            }
+        }
+
+        return $returnValue;
     }
 }
