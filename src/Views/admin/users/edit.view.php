@@ -19,9 +19,7 @@ Actualizar Usuario
           </div>
           <div class="mb-3">
             <label for="email" class="form-label">Email</label>
-            <input type="email" class="form-control" id="email" name="email" value="{{ $usuario->email }}" required
-              pattern="[a-zA-Z0-9!#$%&'*\/=?^_`\{\|\}~\+\-]([\.]?[a-zA-Z0-9!#$%&'*\/=?^_`\{\|\}~\+\-])+@[a-zA-Z0-9]([^@&%$\/\(\)=?¿!\.,:;]|\d)+[a-zA-Z0-9][\.][a-zA-Z]{2,4}([\.][a-zA-Z]{2})?">
-            >
+            <input type="email" class="form-control" id="email" name="email" value="{{ $usuario->email }}" required>
             <div class="invalid-feedback" data-type="valueMissing">
               Por favor ingrese un correo electrónico.
             </div>
