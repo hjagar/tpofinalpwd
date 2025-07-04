@@ -2,16 +2,16 @@
 Se implementará una aplicación de carrito de compras.
 
 ## Sistema desarrollado
-Se implemento una aplicación web con un framework MVC desarrollado especificamente para esta tarea.
+Se implementó una aplicación web con un framework MVC desarrollado específicamente para esta tarea.
 
 ### Framework MVC
 El framework desarrollado se puede ver en la carpeta framework y consta de los siguientes namespaces:
 - Assets: maneja la generación y envío de los assets proporcionados a la aplicación pública.
-- Concers: proporciona algunos traits usados en otras clases.
+- Concerns: proporciona algunos traits usados en otras clases.
 - Configuration: provee clases para la configuración inicial de la aplicación.
 - Core: provee la clase principal de la aplicación.
 - Data: maneja el acceso a los datos.
-- Http: maneja lo referido a las rutas que permitan redirigir a los controladores.
+- Http: maneja lo referido a las rutas que permiten redirigir a los controladores.
 - Mail: provee una funcionalidad básica de envío de correos usando PHPMailer.
 - Security: maneja la autenticación y el usuario de sesión.
 - View: provee el manejo y compilación de vistas.
@@ -27,11 +27,11 @@ Ejecutar el comando
 composer serve
 ```
 
-## Imagenes
+## Imágenes
 ### Base de datos
 ![Database](images/Database.png)
 
-### Home Cliente
+### Home del Cliente
 ![HomeCliente](images/HomeCliente.png)
 
 ### Mis Compras
@@ -43,31 +43,31 @@ composer serve
 ### Carrito de Compras
 ![Cart](images/Cart.png)
 
-### Home Admin
+### Home del Administrador
 ![HomeAdmin](images/HomeAdmin.png)
 
-### Home Admin Menu
+### Menues del Administrador
 ![AdminMenus](images/AdminMenus.png)
 
 ### Home Administración
 ![AdminHome](images/AdminHome.png)
 
-### Home Ventas
+### Home de Ventas
 ![VentasHome](images/VentasHome.png)
 
 ### Edición de Ventas
 ![VentaEdit](images/VentaEdit.png)
 
-### Menu Home
+### Home de Menú
 ![MenuHome](images/MenuHome.png)
 
-### Crear Menu
+### Crear Menú
 ![MenuCreate](images/MenuCreate.png)
 
-### Editar Menu
+### Editar Menú
 ![MenuEdit](images/MenuEdit.png)
 
-### Home Productos
+### Home de Productos
 ![ProductoHome](images/ProductoHome.png)
 
 ### Crear Producto
@@ -76,7 +76,7 @@ composer serve
 ### Editar Producto
 ![ProductoEdit](images/ProductoEdit.png)
 
-### Role
+### Home de Roles
 ![RolesHome](images/RolesHome.png)
 
 ### Crear Rol
@@ -85,7 +85,7 @@ composer serve
 ### Editar Rol
 ![RoleEdit](images/RoleEdit.png)
 
-### Usuarios Home
+### Home de Usuarios
 ![UsersHome](images/UsersHome.png)
 
 ### Crear Usuario
