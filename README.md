@@ -46,9 +46,6 @@ composer serve
 ### Home del Administrador
 ![HomeAdmin](images/HomeAdmin.png)
 
-### Menues del Administrador
-![AdminMenus](images/AdminMenus.png)
-
 ### Home Administración
 ![AdminHome](images/AdminHome.png)
 
