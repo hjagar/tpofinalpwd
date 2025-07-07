@@ -100,7 +100,6 @@ class QueryBuilder
 
     public function where(array $conditions): QueryBuilder
     {
-        //$whereClauses = array_map(fn($key) => "{$key} = :{$this->splitKey($key)}", array_keys($conditions));
         $whereClauses = array_map(function ($key, $value) {
             if (is_array($value)) {
                 $range = range(1, count($value));

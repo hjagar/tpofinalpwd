@@ -2,11 +2,17 @@
 (function(window) {
   const http = (() => {
     const version = '1.0';
+    const isCsrfVerifiableMethod = method => ['POST', 'PUT', 'DELETE'].includes(method);
+
     const request = async (method, url, data = null, headers = {}) => {
       const options = {
         method: method.toUpperCase(),
         headers: { ...headers }
       };
+
+      if(isCsrfVerifiableMethod(options.method)) {
+        options.headers['X-CSRF-TOKEN'] = csrf();
+      }
 
       if (data instanceof FormData) {
         options.body = data;
@@ -18,6 +24,11 @@
       try {
         const response = await fetch(url, options);
         const contentType = response.headers.get("content-type");
+
+        if(isCsrfVerifiableMethod(options.method)) {
+          const csrf = response.headers.get('X-CSRF-TOKEN');
+          setCsrf(csrf);
+        }
 
         let result;
         if (contentType && contentType.includes("application/json")) {

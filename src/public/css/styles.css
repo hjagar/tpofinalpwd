@@ -175,7 +175,63 @@ footer {
     color: #fff;
 }
 
-.auth-form{
+.auth-form {
     margin-left: auto;
     margin-right: auto;
+}
+
+/* Skeleton base style */
+.skeleton {
+    background: linear-gradient(90deg, #e0e0e0 25%, #f0f0f0 50%, #e0e0e0 75%);
+    background-size: 200% 100%;
+    animation: loading 1.5s infinite;
+    border-radius: 4px;
+}
+
+/* Layout container */
+.skeleton-container {
+    max-width: 600px;
+    margin: 2rem auto;
+    padding: 1rem;
+}
+
+/* Simulated elements */
+.skeleton-product-title {
+    height: 20px;
+    width: 40%;
+    margin-bottom: 1rem;
+}
+
+.skeleton-price {
+    height: 20px;
+    width: 30%;
+    margin-bottom: 1rem;
+}
+
+.skeleton-quantity {
+    height: 40px;
+    width: 20%;
+    margin-bottom: 1rem;
+}
+
+.skeleton-total {
+    height: 20px;
+    width: 30%;
+    margin-bottom: 2rem;
+}
+
+.skeleton-button {
+    height: 40px;
+    width: 200px;
+    border-radius: 20px;
+}
+
+@keyframes loading {
+    0% {
+        background-position: 200% 0;
+    }
+
+    100% {
+        background-position: -200% 0;
+    }
 }

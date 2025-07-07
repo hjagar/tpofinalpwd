@@ -69,6 +69,11 @@ class Cart implements JsonSerializable
         return $this->products[$id];
     }
 
+    public function clear()
+    {
+        $this->products = [];
+    }
+
     public function jsonSerialize(): mixed
     {
         return get_object_vars($this);

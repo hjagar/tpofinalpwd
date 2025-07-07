@@ -15,7 +15,9 @@
             alt="{{ $producto->nombre }}" />
           <h3>{{ $producto->nombre }}</h3>
           <p>$ {{ number_format($producto->precio, 2, ',', '.') }}</p>
+          @if(auth()->check())
           <button id="producto_{{ $producto->idproducto }}" r-click="scope.addToCart({{ $producto->idproducto }})">Agregar</button>
+          @endif
         </article>
       @endforeach
     </div>
@@ -34,7 +36,6 @@
             const response = await http.get(route('cart.add', {id}));
             
             if (response.status === http.status.ok) {
-              // TODO:  show toast con el mensaje
               reactive.setState('itemCount', reactive.state.itemCount + 1);              
             }
           }
