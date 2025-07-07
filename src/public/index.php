@@ -42,13 +42,14 @@ $router->get('/my-purchases', [MyPurchasesController::class, 'index'])->name('my
 $router->get('/my-purchases/{id}/show', [MyPurchasesController::class, 'show'])->name('my_purchases.show');
 
 // Rutas del carrito
-$router->get('/cart', [CartController::class, 'index'])->name('cart.index');
-$router->get('/cart-ajax', [CartController::class, 'indexAjax'])->name('cart.index-ajax');
+$router->get('/cart-old', [CartController::class, 'index'])->name('cart.index-old');
+$router->get('/cart', [CartController::class, 'indexAjax'])->name('cart.index');
 $router->get('/cart-ssr', [CartController::class, 'indexSsr'])->name('cart.index-ssr');
 $router->get('/cart-products', [CartController::class, 'cartProducts'])->name('cart.products')->produces(RouteProduceType::JSON);
 $router->get('/cart/add/{id}', [CartController::class, 'add'])->name('cart.add')->produces(RouteProduceType::JSON);
-$router->get('/cart/remove/{id}', [CartController::class, 'remove'])->name('cart.remove')->produces(RouteProduceType::JSON);
-$router->get('/cart/remove-one/{id}', [CartController::class, 'removeOne'])->name('cart.remove-one')->produces(RouteProduceType::JSON);
+$router->post('/cart/remove', [CartController::class, 'remove'])->name('cart.remove')->produces(RouteProduceType::JSON);
+$router->post('/cart/remove-one', [CartController::class, 'removeOne'])->name('cart.remove-one')->produces(RouteProduceType::JSON);
+$router->post('/cart/update', [CartController::class, 'update'])->name('cart.update')->produces(RouteProduceType::JSON);
 $router->post('/cart/buy', [CartController::class, 'buy'])->name('cart.buy')->produces(RouteProduceType::JSON);
 
 // Rutas de contacto

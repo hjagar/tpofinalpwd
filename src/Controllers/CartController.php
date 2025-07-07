@@ -22,6 +22,7 @@ class CartController
     {
         $this->emailSender = new EmailSender();
     }
+
     public function index()
     {
         $cart = $this->getCart();
@@ -75,7 +76,7 @@ class CartController
             $products[] = $product;
         }
 
-        return json(['products' => $products, 'itemCount' => $itemCount, 'total' => $total]);
+        return json(compact('products', 'itemCount', 'total'));
     }
 
     public function add($id)
@@ -103,8 +104,9 @@ class CartController
         return json($returnValue);
     }
 
-    public function remove($id)
+    public function remove(Request $request)
     {
+        $id = $request->id;
         $producto = Producto::find($id);
         $returnValue = new JsonResult();
 
@@ -123,9 +125,9 @@ class CartController
         return json($returnValue);
     }
 
-    public function removeOne($id)
+    public function removeOne(Request $request)
     {
-
+        $id = $request->id;
         $producto = Producto::find($id);
         $returnValue = new JsonResult();
 
@@ -181,9 +183,9 @@ class CartController
         $items = $request->items;
         foreach ($items as $item) {
             $compraItem = new CompraItem();
-            $compraItem->idproducto = $item->idproducto;
+            $compraItem->idproducto = $item->id;
             $compraItem->idcompra = $idcompra;
-            $compraItem->cantidad = $item->cantidad;
+            $compraItem->cantidad = $item->quantity;
             $compraItem->save();
         }
         // Guardo el estado inicial
@@ -192,23 +194,26 @@ class CartController
 
         $compraEstado = new CompraEstado();
         $compraEstado->idcompra = $idcompra;
-        $compraEstado->idcomraestadotipo = $compraEtadoTipo->idcompraestadotipo;
-        $compraEstado->fecha = $todayData;
+        $compraEstado->idcompraestadotipo = $compraEtadoTipo->idcompraestadotipo;
+        $compraEstado->fechainicio = $todayData;
         $compraEstado->save();
 
         // Envío email
         $template = "admin.sales.templates.{$estado}";
         $templateCompiler = new TemplateCompiler($template);
         $data = [
-            'nombre' => $user->usuario,
+            'nombre' => $user->nombre,
             'estado' => $estado,
             'fecha' => $todayEmail,
             'appName' => env('APP_NAME')
         ];
         $emailBody = $templateCompiler->render($data);
         $this->emailSender->send($user->email, 'Actualización de estado de compra', $emailBody, true);
+
+        // Limpio el carrito
+        $this->clearCart();
         // Devolver JsonResult
-        return json(new JsonResult(true, "Compra realizada con exito"));
+        return json("Compra realizada con exito");
     }
 
     private function getCart(): Cart
@@ -233,6 +238,11 @@ class CartController
 
     private function updateOne($productId, $cantidad)
     {
-        $this->getCart()->update($productId, $cantidad);
+        return $this->getCart()->update($productId, $cantidad);
+    }
+
+    private function clearCart()
+    {
+        $this->getCart()->clear();
     }
 }

@@ -5,6 +5,7 @@ namespace PhpMvc\Framework\Http;
 use Closure;
 use PhpMvc\Framework\Core\Application;
 use Exception;
+use PhpMvc\Framework\Http\Constants\HeaderType;
 use PhpMvc\Framework\Http\Constants\RouteProduceType;
 use PhpMvc\Framework\Http\Middleware\CsrfMiddleware;
 use PhpMvc\Framework\Http\Middleware\StartSessionMiddleware;
@@ -25,26 +26,34 @@ class Kernel
     {
         $uri = $request->getUri();
         $method = $request->getMethod();
-
         $route = $this->router->match($uri, $method);
-        $group = $route?->middlewareGroup ?? 'web';
-        $middlewares = $this->middlewareGroups[$group] ?? [];
-        $middlewares = array_merge($middlewares, $route->middlewares);
 
-        $result = $this->handleMiddlewareChain($middlewares, $request, function ($request) use ($uri, $method) {
-            return $this->router->dispatch($uri, $method, $request);
-        });
+        if ($route) {
+            $group = $route?->middlewareGroup ?? 'web';
+            $middlewares = $this->middlewareGroups[$group] ?? [];
+            $middlewares = array_merge($middlewares, $route->middlewares);
 
-        if ($result instanceof Response) {
-            return $result;
-        } else {
-            if ($route->produces === RouteProduceType::JSON || is_array($result) || is_object($result)) {
-                $responseClass = JsonResponse::class;
+            $result = $this->handleMiddlewareChain($middlewares, $request, function ($request) use ($uri, $method) {
+                return $this->router->dispatch($uri, $method, $request);
+            });
+
+            if ($result instanceof Response) {
+                return $result;
             } else {
-                $responseClass = Response::class;
-            }
+                $headers = [];
 
-            return new $responseClass($result, HttpStatus::OK->value);
+                if ($route->produces === RouteProduceType::JSON || is_array($result) || is_object($result)) {
+                    $responseClass = JsonResponse::class;
+                    $headers[HeaderType::X_CSRF_TOKEN] = csrf_token();
+                } else {
+                    $responseClass = Response::class;
+                }
+
+                return new $responseClass($result, HttpStatus::OK->value, $headers);
+            }
+        }
+        else {
+            return new Response('404 Not Found', HttpStatus::NOT_FOUND->value);
         }
     }
 

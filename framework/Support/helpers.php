@@ -122,19 +122,47 @@ if (!function_exists('regenerateCsrfToken')) {
     }
 }
 
+if (!function_exists('csrf_token')) {
+    function csrf_token(){
+        $returnValue = "";
+
+        if (sessionStarted()) {
+            $returnValue = $_SESSION['csrf_token'];
+        }
+
+        return $returnValue;
+    }
+}
+
 if (!function_exists('csrf')) {
     function csrf()
     {
         $returnValue = "";
+        $csrfToken = csrf_token();
 
-        if (sessionStarted()) {
-            $csrfToken = $_SESSION['csrf_token'];
+        if ($csrfToken) {
             $returnValue = "<input type=\"hidden\" id=\"csrf_token\" name=\"csrf_token\" value=\"{$csrfToken}\" />";
         }
 
         return $returnValue;
     }
 }
+
+if (!function_exists('csrf_meta')) {
+    function csrf_meta()
+    {
+        $returnValue = "";
+        $csrfToken = csrf_token();
+
+        if ($csrfToken) {
+            $returnValue = "<meta name=\"csrf_token\" content=\"{$csrfToken}\" />";
+        }
+
+        return $returnValue;
+    }
+}
+
+
 
 if (!function_exists('redirect')) {
     function redirect(string $routeName, $parameters = []): RedirectResponse

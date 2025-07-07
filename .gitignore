@@ -4,3 +4,7 @@ composer.lock
 .env
 */storage/views/
 src/public/assets/*
+framework/Assets/Javascript/reactive-prev.js
+framework/Assets/Javascript/reactive-prev.js.bak
+framework/Assets/Javascript/reactive.js.bak
+CLAUDE.md

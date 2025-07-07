@@ -24,6 +24,7 @@
         "assets": "<?php echo $env->assets(expr); ?>",
         "emailPattern": "<?php echo emailPattern(); ?>",
         "selected": "<?php echo ((expr) ? 'selected' : ''); ?>",
-        "reactiveRoutes": "<?php echo reactiveRoutes(); ?>"
+        "reactiveRoutes": "<?php echo reactiveRoutes(); ?>",
+        "csrf_meta": "<?php echo csrf_meta(); ?>"
     }
 }

@@ -10,7 +10,15 @@ function route(name, params = {}) {
 }
 
 function redirect(name, params = {}) {
-    const url = route(name, params);
+  const url = route(name, params);
 
-    document.location = url;
+  document.location = url;
+}
+
+function csrf() {
+  return document.querySelector('meta[name="csrf_token"]').getAttribute('content');
+}
+
+function setCsrf(csrf) {
+  document.querySelector('meta[name="csrf_token"]').setAttribute('content', csrf);
 }

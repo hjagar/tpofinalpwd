@@ -429,29 +429,17 @@ abstract class Model
         return $this->getAffix($this->primaryKeySuffix);
     }
 
-    public function prepareParams(array $params/* , ?array $paramKeys = null */): array
+    public function prepareParams(array $params): array
     {
-        // if ($paramKeys === null) {
-        //     $paramKeys = array_keys($params);
-        // }
-
-        // $this->params = array_combine(
-        //     $this->makePlaceholders($paramKeys),
-        //     array_values($params)
-        // );
-
-
         foreach ($params as $key => $value) {
             if (is_array($value)) {
                 $range = range(1, count($value));
-                $keys = array_map(fn($r) => ":{$key}{$r}", $range);
+                $keys = array_map(fn($r) => ":{$this->splitKey($key)}{$r}", $range);
                 $this->params = array_merge($this->params, array_combine($keys, $value));
             } else {
-                $this->params[":{$key}"] = $value;
+                $this->params[":{$this->splitKey($key)}"] = $value;
             }
         }
-
-
 
         return $this->params;
     }
