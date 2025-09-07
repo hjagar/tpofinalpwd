@@ -69,7 +69,6 @@ class Asset
             $properties = " {$this->properties}";
         }
 
-
         $returnValue = match ($this->type) {
             AssetType::JS => "<script src=\"{$assetUrl}\" defer{$properties}></script>" . PHP_EOL,
             AssetType::DYNAMICJS => "<script src=\"{$assetUrl}\" defer{$properties}></script>" . PHP_EOL,

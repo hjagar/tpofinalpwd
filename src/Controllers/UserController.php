@@ -44,6 +44,7 @@ class UserController
             abort(404, 'User not found');
         }
         $usuario->fill($request->all());
+        $usuario->password = password_hash($request->password, PASSWORD_DEFAULT);
         $usuario->save();
 
         redirect('admin.users.index');
