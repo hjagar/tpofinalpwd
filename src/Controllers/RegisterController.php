@@ -32,7 +32,7 @@ class RegisterController
     {
         $usuario = new Usuario();
         $usuario->fill($request->all());
-        $usuario->uspass = password_hash($request->uspass, PASSWORD_DEFAULT);
+        $usuario->password = password_hash($request->password, PASSWORD_DEFAULT);
         $usuario->save();
         $usuario->assignRole(Roles::CLIENTE);
 

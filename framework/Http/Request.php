@@ -8,7 +8,7 @@ use stdClass;
 class Request
 {
     use HasProperty;
-    private readonly object $jsonPayload;
+    private readonly array $jsonPayload;
 
     public function __construct(
         private readonly array $query = [],
@@ -54,8 +54,10 @@ class Request
             return $this->cookies[$key];
         } elseif (array_key_exists($key, $this->files)) {
             return $this->files[$key];
-        } elseif (property_exists($this->jsonPayload, $key)) {
-            return $this->jsonPayload->$key;
+        // } elseif (property_exists($this->jsonPayload, $key)) {
+        //     return $this->jsonPayload->$key;
+        } elseif (array_key_exists($key, $this->jsonPayload)) {
+            return $this->jsonPayload[$key];
         } else {
             $method = 'get' . ucfirst($key);
 
@@ -98,10 +100,10 @@ class Request
     {
         if ($this->isJson()) {
             $input = file_get_contents('php://input');
-            $this->jsonPayload = json_decode($input) ?? new stdClass;
+            $this->jsonPayload = json_decode($input, true) ?? []; // new stdClass;
         }
         else {
-            $this->jsonPayload = new stdClass;
+            $this->jsonPayload = []; // new stdClass;
         }
     }
 }

@@ -16,7 +16,7 @@ use PhpMvc\Framework\Data\Constants\ModelRelationType;
  */
 class Usuario extends Model
 {
-    protected array $fillable = ['usnombre', 'usmail'];
+    protected array $fillable = ['nombre', 'email'];
 
     protected array $relations = [
         'roles' => [ModelRelationType::BelongsToMany, Rol::class, 'usuariorol'],
