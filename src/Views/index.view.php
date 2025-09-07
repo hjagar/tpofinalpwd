@@ -36,7 +36,13 @@
             const response = await http.get(route('cart.add', {id}));
             
             if (response.status === http.status.ok) {
-              reactive.setState('itemCount', reactive.state.itemCount + 1);              
+              const responseData = JSON.parse(response.content);
+              if(responseData.success){
+                reactive.setState('itemCount', reactive.state.itemCount + 1);
+              }
+              else{
+                alert(responseData.message);
+              }               
             }
           }
         }
