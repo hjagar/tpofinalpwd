@@ -63,17 +63,20 @@ class CartController
     {
         $cart = $this->getCart();
         $productIds = $cart->getProductIds();
-        $productos = Producto::where(['idproducto' => $productIds])->get();
         $products = [];
         $itemCount = 0;
         $total = 0;
 
-        foreach ($productos as $producto) {
-            $quantity = $cart->itemCount($producto->idproducto);
-            $product = new Product($producto->idproducto, $producto->nombre, $producto->precio, $quantity);
-            $itemCount += $quantity;
-            $total += $product->total();
-            $products[] = $product;
+        if(!empty($productIds)) {
+            $productos = Producto::where(['idproducto' => $productIds])->get();
+
+            foreach ($productos as $producto) {
+                $quantity = $cart->itemCount($producto->idproducto);
+                $product = new Product($producto->idproducto, $producto->nombre, $producto->precio, $quantity);
+                $itemCount += $quantity;
+                $total += $product->total();
+                $products[] = $product;
+            }           
         }
 
         return json(compact('products', 'itemCount', 'total'));

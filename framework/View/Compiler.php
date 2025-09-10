@@ -2,8 +2,6 @@
 
 namespace PhpMvc\Framework\View;
 
-use InvalidArgumentException;
-
 class Compiler
 {
     private const ENVIRONMENT_CODE = "<?php use PhpMvc\\Framework\\View\\Environment;\n\$env = Environment::getInstance();?>";

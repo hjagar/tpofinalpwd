@@ -2,7 +2,8 @@
 .vscode/
 composer.lock
 .env
-*/storage/views/
+*/storage/views/*.php
+*/storage/views/*.json
 src/public/assets/*
 framework/Assets/Javascript/reactive-prev.js
 framework/Assets/Javascript/reactive-prev.js.bak

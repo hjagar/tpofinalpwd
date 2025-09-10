@@ -5,6 +5,14 @@ namespace App\Models;
 use PhpMvc\Framework\Data\Model;
 use PhpMvc\Framework\Data\Constants\ModelRelationType;
 
+/**
+ * Class Compra
+ * Representa una compra en el sistema.
+ *
+ * @property int $id
+ * @property int $idusuario
+ * @property string $fecha
+ */
 class Compra extends Model
 {
     protected array $relations = [

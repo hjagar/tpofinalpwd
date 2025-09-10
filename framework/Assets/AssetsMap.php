@@ -3,8 +3,6 @@
 namespace PhpMvc\Framework\Assets;
 
 use Exception;
-use ReflectionClass;
-use stdClass;
 
 class AssetsMap
 {

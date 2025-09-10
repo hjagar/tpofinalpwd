@@ -36,6 +36,6 @@ class RegisterController
         $usuario->save();
         $usuario->assignRole(Roles::CLIENTE);
 
-        redirect('login.index');
+        redirect('auth.index');
     }
 }

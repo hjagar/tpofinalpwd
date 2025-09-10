@@ -5,6 +5,18 @@ namespace App\Models;
 use PhpMvc\Framework\Data\Model;
 use PhpMvc\Framework\Data\Constants\ModelRelationType;
 
+/**
+ * Class Menu
+ * Representa un menu en el sistema.
+ *  
+ * @property int $idmenu
+ * @property string $nombre
+ * @property string $descripcion
+ * @property int $idpadre
+ * @property string $route_name
+ * @property string $html_id
+ * @property bool $has_user
+ */
 class Menu extends Model
 {
     protected array $fillable = [

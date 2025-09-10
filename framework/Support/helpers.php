@@ -162,8 +162,6 @@ if (!function_exists('csrf_meta')) {
     }
 }
 
-
-
 if (!function_exists('redirect')) {
     function redirect(string $routeName, $parameters = []): RedirectResponse
     {
@@ -212,6 +210,12 @@ if (!function_exists('parseReactive')) {
 }
 
 if (!function_exists('reactiveRoutes')) {
+    /**
+     * Obtiene el string que define las rutas reactivas,
+     * como una cadena JavaScript que se asigna a window.ROUTES.
+     * 
+     * @return string
+     */
     function reactiveRoutes() {
         return app()->getReactiveRoutes();
     }

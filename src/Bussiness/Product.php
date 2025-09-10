@@ -7,6 +7,7 @@ use JsonSerializable;
 class Product implements JsonSerializable
 {
     private float $total;
+    
     public function __construct(private int $id, private string $name, private float $price, private int $quantity)
     {
         $this->total = $this->quantity * $this->price;
