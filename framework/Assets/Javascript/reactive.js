@@ -234,7 +234,7 @@
                 };
             }
             const value = el._r_show_eval();
-            el.style.display = value ? '' : 'none';
+            el.style.setProperty('display', value ? '' : 'none', value ? '' : 'important');
         });
 
         document.querySelectorAll('[r-if]').forEach(el => {
@@ -269,17 +269,6 @@
                 });
             }
         });
-
-        // document.querySelectorAll('[r-for]').forEach(el => {
-        //     if (!el._r_for_key) {
-        //         const exp = el.getAttribute('r-for');
-        //         const match = exp.match(/^(\w+)\s+in\s+(\w+)$/);
-        //         if (!match) return console.error('Sintaxis inválida en r-for:', exp);
-        //         const [, itemName, k] = match;
-        //         bindFor(el, k, itemName);
-        //     }
-        //     if (el._r_for_key === key) renderFor(el);
-        // });
 
         forRegistry.forEach(el => {
             if (el._r_for_key === key) renderFor(el);
@@ -366,8 +355,6 @@
             Object.assign(scope, config.scope);
         }
     }
-
-    //document.addEventListener('DOMContentLoaded', initReactive);
 
     window.reactive = {
         version,

@@ -67,6 +67,16 @@ class EmailSender
         }
     }
 
+    /**
+     * Agrega una dirección de respuesta al correo.
+     *
+     * @param string $address
+     * @param string $name
+     */
+    public function addReplyTo(string $address, string $name = ''): void {
+        $this->mailer->addReplyTo($address, $name);
+    }
+
     public function sendFrom(string $fromEmail, string $fromName, string $to, string $subject, string $body, bool $isHtml = false)
     {
         $this->mailer->setFrom($fromEmail, $fromName);

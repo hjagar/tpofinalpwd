@@ -43,10 +43,10 @@
                 <button r-click="scope.remove(product.id)" type="button" class="btn btn-danger btn-sm">⊘</button>
               </li>
             </ul>
-            <div class="d-flex justify-content-end mt-3">
+            <div class="d-flex justify-content-end mt-3" r-show="itemCount">
               <strong>Total: $ <span r-text="total"></span></strong>
             </div>
-            <div class="d-flex justify-content-end mt-3">
+            <div class="d-flex justify-content-end mt-3" r-show="itemCount">
               <button r-click="scope.buy()" type="button" class="btn btn-success">Finalizar Compra</button>
             </div>
             <p r-show="!itemCount" class="text-center">Tu carrito está vacío.</p>

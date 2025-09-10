@@ -6,42 +6,7 @@ class Pluralize
 {
     private bool $enabled;
     private string $locale;
-    private array $pluralizeRegex/*  = [
-        'en' => [
-            [
-                'match' => '/[^aeiou]y$/i',
-                'replace' => '/y$/i',
-                'replacement' => 'ies'
-            ],
-            [
-                'match' => '/(ch|s|sh|x|z)$/i',
-                'replace' => '/$/i',
-                'replacement' => 'es'
-            ],
-            [
-                'match' => '/(f|fe)$/i',
-                'replace' => '/(f|fe)$/i',
-                'replacement' => 'ves'
-            ]
-        ],
-        'es' => [
-            [
-                'match' => '/[aeiou]$/i',
-                'replace' => '/$/i',
-                'replacement' => 's'
-            ],
-            [
-                'match' => '/z$/i',
-                'replace' => '/z$/i',
-                'replacement' => 'es'
-            ],
-            [
-                'match' => '/[bcdfghjklmnñpqrstvwxyz]$/i',
-                'replace' => '/$/i',
-                'replacement' => 'es'
-            ]
-        ]
-    ] */;
+    private array $pluralizeRegex;
 
     public function __construct()
     {

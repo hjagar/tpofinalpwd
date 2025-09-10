@@ -10,9 +10,9 @@ use PhpMvc\Framework\Data\Constants\ModelRelationType;
  * Representa un usuario en el sistema.
  *
  * @property int $id
- * @property string $usnombre
- * @property string $usmail
- * @property string $uspass
+ * @property string $nombre
+ * @property string $email
+ * @property string $password
  */
 class Usuario extends Model
 {
@@ -31,12 +31,13 @@ class Usuario extends Model
      */
     public function assignRole(string $roleName): void
     {
-        $role = Rol::where(['rodescripcion' => $roleName])->first();
+        $role = Rol::where(['nombre' => $roleName])->first();
+        
         if ($role) {
             self::rawQuery('sqlAssignRole', [$this->idusuario, $role->idrol]);
         }
     }
-
+ 
     public function sqlAssignRole(){
         $sql =
             "INSERT INTO usuariorol (idusuario, idrol) VALUES(?, ?);";

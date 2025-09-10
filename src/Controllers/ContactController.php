@@ -45,6 +45,9 @@ class ContactController
     private function sendContactEmail(array $data)
     {
         $emailSender = new EmailSender();
-        return $emailSender->sendFrom($data['email'], $data['name'], 'tiendatuya@gmail.com', 'Mensaje de Cliente', $data['message'], true);
+        $adminEmail = env('APP_ADMIN_EMAIL', 'admin@example.com');
+
+        $emailSender->addReplyTo($data['email'], $data['name']);
+        return $emailSender->send($adminEmail, 'Mensaje de Cliente', $data['message'], true);
     }
 }

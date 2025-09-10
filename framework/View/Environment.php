@@ -2,10 +2,7 @@
 
 namespace PhpMvc\Framework\View;
 
-use PhpMvc\Framework\Assets\Asset;
 use PhpMvc\Framework\Assets\AssetsManager;
-use PhpMvc\Framework\Assets\AssetsMap;
-use PhpMvc\Framework\Assets\AssetTypes;
 
 class Environment
 {

@@ -10,5 +10,4 @@ class HeaderType
     public const AUTHOR = 'X-Author';
     public const X_CSRF_TOKEN = 'X-CSRF-TOKEN';
     public const CSRF_TOKEN = 'csrf_token';
-
 }

@@ -3,7 +3,6 @@
 namespace PhpMvc\Framework\Http;
 
 use PhpMvc\Framework\Concerns\HasProperty;
-use stdClass;
 
 class Request
 {
@@ -54,8 +53,6 @@ class Request
             return $this->cookies[$key];
         } elseif (array_key_exists($key, $this->files)) {
             return $this->files[$key];
-        // } elseif (property_exists($this->jsonPayload, $key)) {
-        //     return $this->jsonPayload->$key;
         } elseif (array_key_exists($key, $this->jsonPayload)) {
             return $this->jsonPayload[$key];
         } else {
@@ -100,10 +97,10 @@ class Request
     {
         if ($this->isJson()) {
             $input = file_get_contents('php://input');
-            $this->jsonPayload = json_decode($input, true) ?? []; // new stdClass;
+            $this->jsonPayload = json_decode($input, true) ?? [];
         }
         else {
-            $this->jsonPayload = []; // new stdClass;
+            $this->jsonPayload = [];
         }
     }
 }
