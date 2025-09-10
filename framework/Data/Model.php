@@ -371,8 +371,7 @@ abstract class Model
 
     public function fill(array $fields): void
     {
-        $postFields = array_keys($fields);
-        unset($postFields['csrf_token']);
+        $postFields = array_filter(array_keys($fields), fn($field) => $field !== 'csrf_token');
         $fieldsToFill = array_intersect($this->fillable, $postFields) ?: $postFields;
 
         foreach ($fieldsToFill as $field) {
