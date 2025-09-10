@@ -30,7 +30,8 @@ class Request
     }
 
     /**
-     * Create a Request instance from global variables.
+     * Crea una instancia de la clase Request a partir de las variables 
+     * globales $_GET, $_POST, $_COOKIE, $_FILES y $_SERVER.
      *
      * @return Request
      */

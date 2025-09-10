@@ -3,7 +3,6 @@
 namespace PhpMvc\Framework\Http;
 
 use Closure;
-use PhpMvc\Framework\Core\Application;
 use Exception;
 use PhpMvc\Framework\Http\Constants\HeaderType;
 use PhpMvc\Framework\Http\Constants\RouteProduceType;
@@ -18,7 +17,6 @@ class Kernel
             CsrfMiddleware::class
         ]
     ];
-
 
     public function __construct(private readonly Router $router) {}
 
