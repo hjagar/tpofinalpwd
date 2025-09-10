@@ -37,7 +37,7 @@
             
             if (response.status === http.status.ok) {
               const responseData = JSON.parse(response.content);
-              if(responseData.success){
+              if(responseData.data.success){
                 reactive.setState('itemCount', reactive.state.itemCount + 1);
               }
               else{

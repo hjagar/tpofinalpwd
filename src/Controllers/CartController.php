@@ -9,6 +9,7 @@ use App\Models\CompraEstado;
 use App\Models\CompraEstadoTipo;
 use App\Models\CompraItem;
 use App\Models\Producto;
+use PhpMvc\Framework\Concerns\MapObjects;
 use PhpMvc\Framework\Http\JsonResult;
 use PhpMvc\Framework\Http\Request;
 use PhpMvc\Framework\Mail\EmailSender;
@@ -16,6 +17,7 @@ use PhpMvc\Framework\Mail\TemplateCompiler;
 
 class CartController
 {
+    use MapObjects;
     private EmailSender $emailSender;
 
     public function __construct()
@@ -183,7 +185,8 @@ class CartController
         $idcompra = $compra->idcompra;
 
         // Guardo los items
-        $items = $request->items;
+        $items = $this->mapToGenericObjects($request->items);
+
         foreach ($items as $item) {
             $compraItem = new CompraItem();
             $compraItem->idproducto = $item->id;
