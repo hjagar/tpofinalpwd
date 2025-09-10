@@ -185,7 +185,6 @@ class CartController
         $idcompra = $compra->idcompra;
 
         // Guardo los items
-        //$items = array_map(fn($item) => (object)$item, $request->items);
         $items = $this->mapToGenericObjects($request->items);
 
         foreach ($items as $item) {
