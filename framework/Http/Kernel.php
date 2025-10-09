@@ -6,8 +6,10 @@ use Closure;
 use Exception;
 use PhpMvc\Framework\Http\Constants\HeaderType;
 use PhpMvc\Framework\Http\Constants\RouteProduceType;
+use PhpMvc\Framework\Http\Middleware\AuthMiddleware;
 use PhpMvc\Framework\Http\Middleware\CsrfMiddleware;
 use PhpMvc\Framework\Http\Middleware\StartSessionMiddleware;
+use PhpMvc\Framework\Http\Middleware\AuthorizationMiddleware;
 
 class Kernel
 {

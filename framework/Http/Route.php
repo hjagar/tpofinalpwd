@@ -60,6 +60,13 @@ class Route
         return $this;
     }
 
+    public function middlewares(array $middlewares)
+    {
+        $this->middlewares = array_merge($this->middlewares, $middlewares) ?? $middlewares;
+
+        return $this;
+    }
+
     public function getMiddlewareGroup()
     {
         return $this->middlewareGroupName;

@@ -8,6 +8,7 @@ use PhpMvc\Framework\Http\Kernel;
 use PhpMvc\Framework\Http\Request;
 use PhpMvc\Framework\Http\Router;
 use PhpMvc\Framework\Security\AuthManager;
+use PhpMvc\Framework\Security\AuthorizationInterface;
 
 class Application
 {
@@ -21,6 +22,7 @@ class Application
     private string $viewPath;
     private string $compiledViewPath;
     private $appController = null;
+    private AuthorizationInterface $authorizationManager = null;
     private ?AuthManager $authManager = null;
 
     public function __construct(private readonly string $basePath)
@@ -69,6 +71,12 @@ class Application
     {
         $this->authManager = $authManager;
     }
+
+    public function setAuthorizationManager($authorizationManager)
+    {
+        $this->authorizationManager = $authorizationManager;
+    }
+
 
     public function getBasePath(): string
     {
@@ -120,6 +128,15 @@ class Application
         }
 
         return $this->authManager;
+    }
+
+    public function getAuthorization()
+    {
+        if ($this->authorizationManager === null) {
+            throw new Exception('Authorization service is not available.');
+        }
+
+        return $this->authorizationManager;
     }
 
     public function getReactiveRoutes()

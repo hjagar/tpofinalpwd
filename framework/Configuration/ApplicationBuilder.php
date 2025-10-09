@@ -44,4 +44,10 @@ class ApplicationBuilder
         $this->app->setAuthManager(new AuthManager($this->app, $userClass));
         return $this;
     }
+
+    public function withAuthorization($class): ApplicationBuilder
+    {
+        $this->app->setAuthorizationManager($class);
+        return $this;
+    }
 }
