@@ -5,7 +5,7 @@ namespace App\Security;
 use PhpMvc\Framework\Security\AuthorizationInterface;
 use PhpMvc\Framework\Http\Request;
 
-class VerifySecurity implements AuthorizationInterface
+class AuthorizationManager implements AuthorizationInterface
 {
     public function check(Request $request): bool
     {

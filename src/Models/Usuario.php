@@ -43,4 +43,17 @@ class Usuario extends Model
             "INSERT INTO usuariorol (idusuario, idrol) VALUES(?, ?);";
         return $sql;
     }
+
+    public function sqlAuthorizationCheck() {
+        $sql = 
+            "SELECT u.idusuario, u.nombre AS username, u.email, m.nombre AS menuname, m.route_name
+            FROM usuario AS u
+                INNER JOIN usuariorol AS ur
+                    ON u.idusuario = ur.idusuario
+                INNER JOIN menurol AS mr
+                    ON ur.idrol = mr.idrol
+                INNER JOIN menu AS m
+                    ON mr.idmenu = m.idmenu
+            WHERE m.route_name IS NOT NULL";
+    }
 }

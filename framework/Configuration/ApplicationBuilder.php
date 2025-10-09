@@ -47,7 +47,7 @@ class ApplicationBuilder
 
     public function withAuthorization($class): ApplicationBuilder
     {
-        $this->app->setAuthorizationManager($class);
+        $this->app->setAuthorizationManager(new $class());
         return $this;
     }
 }
