@@ -220,3 +220,9 @@ if (!function_exists('reactiveRoutes')) {
         return app()->getReactiveRoutes();
     }
 }
+
+if (!function_exists('user')) {
+    function user() {
+        return auth()->user();
+    }
+}   

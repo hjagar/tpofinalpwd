@@ -9,7 +9,8 @@ class AuthorizationMiddleware implements MiddlewareContract
     public function handle(Request $request, Closure $next)
     {
         if(!app()->getAuthorization()->check($request)) {
-            header('Location: /login');
+            http_response_code(403);
+            echo "403 - No tienes permisos para acceder a esta página.";
             exit;
         }
 

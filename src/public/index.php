@@ -76,9 +76,9 @@ $router->post('/admin/roles/{id}', [RoleController::class, 'update'])->name('adm
 $router->post('/admin/roles/{id}/delete', [RoleController::class, 'destroy'])->name('admin.roles.destroy'); //->middleware(AuthorizationMiddleware::class);
 // Rutas de administración de usuarios
 $router->get('/admin/users', [UserController::class, 'index'])->name('admin.users.index')->middleware(AuthorizationMiddleware::class);
-$router->get('/admin/users/create', [UserController::class, 'create'])->name('admin.users.create'); //->middleware(AuthorizationMiddleware::class);
+$router->get('/admin/users/create', [UserController::class, 'create'])->name('admin.users.create')->middleware(AuthorizationMiddleware::class);
 $router->post('/admin/users', [UserController::class, 'store'])->name('admin.users.store'); //->middleware(AuthorizationMiddleware::class);
-$router->get('/admin/users/{id}/edit', [UserController::class, 'edit'])->name('admin.users.edit'); //->middleware(AuthorizationMiddleware::class);
+$router->get('/admin/users/{id}/edit', [UserController::class, 'edit'])->name('admin.users.edit')->middleware(AuthorizationMiddleware::class);
 $router->post('/admin/users/{id}', [UserController::class, 'update'])->name('admin.users.update'); //->middleware(AuthorizationMiddleware::class);
 $router->post('/admin/users/{id}/delete', [UserController::class, 'destroy'])->name('admin.users.destroy'); //->middleware(AuthorizationMiddleware::class);
 // Rutas de administración de productos
