@@ -44,6 +44,13 @@ class Usuario extends Model
         return $sql;
     }
 
+    /**
+     * Genera una consulta para verificar si un usuario tiene acceso a una ruta en particular.
+     *
+     * La consulta devuelve 1 si el usuario tiene acceso a la ruta y 0 en caso contrario.
+     *
+     * @return string La consulta para verificar si un usuario tiene acceso a una ruta.
+     */
     public function sqlAuthorizationCheck() {
         $sql = 
             "SELECT 1 AS HasAccess

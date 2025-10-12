@@ -8,6 +8,15 @@ use PhpMvc\Framework\Http\Request;
 
 class AuthorizationManager implements AuthorizationInterface
 {
+    /**
+     * Comprueba si el usuario tiene acceso a una ruta en particular.
+     * La funcion utiliza una expresion regular para extraer la ruta base de la request
+     * y luego consulta a la base de datos para verificar si el usuario tiene permiso
+     * para acceder a esa ruta.
+     *
+     * @param Request $request La request actual.
+     * @return bool True si el usuario tiene acceso, false en caso contrario.
+     */
     public function check(Request $request): bool
     {
         $idusuario = user()?->idusuario;
