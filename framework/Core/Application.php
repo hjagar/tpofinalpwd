@@ -72,7 +72,7 @@ class Application
         $this->authManager = $authManager;
     }
 
-    public function setAuthorizationManager($authorizationManager)
+    public function setAuthorizationManager(AuthorizationInterface $authorizationManager)
     {
         $this->authorizationManager = $authorizationManager;
     }

@@ -6,6 +6,7 @@ use PhpMvc\Framework\Core\Application;
 use PhpMvc\Framework\Http\Kernel;
 use PhpMvc\Framework\Http\Router;
 use PhpMvc\Framework\Security\AuthManager;
+use PhpMvc\Framework\Security\AuthorizationInterface;
 
 class ApplicationBuilder
 {
@@ -45,7 +46,14 @@ class ApplicationBuilder
         return $this;
     }
 
-    public function withAuthorization($class): ApplicationBuilder
+    /**
+     * Configura el AuthorizationManager de la aplicación.
+     *
+     * @param string $class El nombre de la clase que implementa AuthorizationInterface.
+     * @return ApplicationBuilder La instancia actual de ApplicationBuilder para encadenamiento.
+     * @throws \RuntimeException Si la clase no implementa AuthorizationInterface.
+     */
+    public function withAuthorization(AuthorizationInterface $class): ApplicationBuilder
     {
         $this->app->setAuthorizationManager(new $class());
         return $this;
