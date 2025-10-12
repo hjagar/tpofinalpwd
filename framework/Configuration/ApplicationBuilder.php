@@ -53,7 +53,7 @@ class ApplicationBuilder
      * @return ApplicationBuilder La instancia actual de ApplicationBuilder para encadenamiento.
      * @throws \RuntimeException Si la clase no implementa AuthorizationInterface.
      */
-    public function withAuthorization(AuthorizationInterface $class): ApplicationBuilder
+    public function withAuthorization(string $class): ApplicationBuilder
     {
         $this->app->setAuthorizationManager(new $class());
         return $this;
