@@ -24,7 +24,7 @@ class AuthorizationManager implements AuthorizationInterface
         $requestUri = $request->getUri();
         preg_match_all($regex, $requestUri, $matches, PREG_SET_ORDER, 0);
         $matchedUri = $matches[0]['BaseRoute'];
-        $hasAccessResult = Usuario::rawQueryOne('sqlAuthorizationCheck', [$idusuario, $matchedUri]);
+        $hasAccessResult = Usuario::rawQueryOne('sqlAuthorizationCheck', [$idusuario,  str_replace('-', '_', $matchedUri)]);
 
         return $hasAccessResult->HasAccess === 1;
     }

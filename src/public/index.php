@@ -23,6 +23,7 @@ use PhpMvc\Framework\Http\Constants\RouteProduceType;
 use PhpMvc\Framework\Http\Middleware\AuthorizationMiddleware;
 use PhpMvc\Framework\Http\Router;
 use App\Security\AuthorizationManager;
+use PhpMvc\Framework\Http\Middleware\AuthMiddleware;
 
 $router = new Router();
 
@@ -45,7 +46,7 @@ $router->get('/my-purchases/{id}/show', [MyPurchasesController::class, 'show'])-
 
 // Rutas del carrito
 $router->get('/cart-old', [CartController::class, 'index'])->name('cart.index-old');
-$router->get('/cart', [CartController::class, 'indexAjax'])->name('cart.index')->middleware(AuthorizationMiddleware::class);;
+$router->get('/cart', [CartController::class, 'indexAjax'])->name('cart.index')->middlewares([AuthMiddleware::class, AuthorizationMiddleware::class]);
 $router->get('/cart-ssr', [CartController::class, 'indexSsr'])->name('cart.index-ssr');
 $router->get('/cart-products', [CartController::class, 'cartProducts'])->name('cart.products')->produces(RouteProduceType::JSON);
 $router->get('/cart/add/{id}', [CartController::class, 'add'])->name('cart.add')->produces(RouteProduceType::JSON);

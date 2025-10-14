@@ -20,7 +20,13 @@ class AuthController
             $usuario = auth()->getDbUser('idusuario');
             $roles = $usuario->roles()->get();
             auth()->user()->roles = array_map(fn($role) => $role->nombre, $roles);
-            redirect('home.index');
+            if (isset($_SESSION['redirect'])) {
+                $redirect = $_SESSION['redirect'];
+                unset($_SESSION['redirect']);
+                redirect($redirect);
+            } else {
+                redirect('home.index');
+            }
         } else {
             return view('auth.login', ['error' => 'Credenciales inválidas']);
         }

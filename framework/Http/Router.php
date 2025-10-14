@@ -66,9 +66,10 @@ class Router
             }
         }
 
-        http_response_code(404);
-        echo "404 - Ruta no encontrada";
-        return null;
+        // http_response_code(404);
+        // echo "404 - Ruta no encontrada";
+        // return null;
+        return ResponseError::notFound();
     }
 
     public function match(string $uri, string $method): ?Route
