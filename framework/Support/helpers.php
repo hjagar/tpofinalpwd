@@ -4,6 +4,7 @@ use PhpMvc\Framework\Configuration\DotEnv;
 use PhpMvc\Framework\Core\Application;
 use PhpMvc\Framework\View\View;
 use PhpMvc\Framework\Http\RedirectResponse;
+use PhpMvc\Framework\Http\ResponseError;
 
 if (!function_exists('env')) {
     /**
@@ -166,16 +167,22 @@ if (!function_exists('redirect')) {
     function redirect(string $routeName, $parameters = []): RedirectResponse
     {
         $url = app()->getRoute($routeName, $parameters);
+
+        if(empty($url)) {
+            $url = $routeName;
+        }
+        
         return new RedirectResponse($url);
     }
 }
 
 if (!function_exists('abort')) {
-    function abort(int $statusCode, string $message = ''): void
+    function abort(int $statusCode, string $message = ''): ResponseError
     {
-        http_response_code($statusCode);
-        echo $message;
-        exit;
+        // http_response_code($statusCode);
+        // echo $message;
+        // exit;
+        return new ResponseError($statusCode, $message);
     }
 }
 
@@ -220,3 +227,9 @@ if (!function_exists('reactiveRoutes')) {
         return app()->getReactiveRoutes();
     }
 }
+
+if (!function_exists('user')) {
+    function user() {
+        return auth()->user();
+    }
+}   

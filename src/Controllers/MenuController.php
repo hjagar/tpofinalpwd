@@ -4,6 +4,7 @@ namespace App\Controllers;
 
 use App\Models\Menu;
 use PhpMvc\Framework\Http\Request;
+use PhpMvc\Framework\Http\HttpStatus;
 
 class MenuController
 {
@@ -34,7 +35,7 @@ class MenuController
         $menu = Menu::find($id);
         $menus = Menu::all();
         if (!$menu) {
-            abort(404, 'Menu not found');
+            abort(HttpStatus::NOT_FOUND->value, 'Menu no encontrado');
         }
 
         return view('admin.menus.edit', compact('menu', 'menus'));
@@ -44,7 +45,7 @@ class MenuController
     {
         $menu = Menu::find($id);
         if (!$menu) {
-            abort(404, 'Menu not found');
+            abort(HttpStatus::NOT_FOUND->value, 'Menu no encontrado');
         }
         $menu->fill($request->all());
         $menu->save();
@@ -56,7 +57,7 @@ class MenuController
     {
         $menu = Menu::find($id);
         if (!$menu) {
-            abort(404, 'Menu not found');
+            abort(HttpStatus::NOT_FOUND->value, 'Menu no encontrado');
         }
         $menu->delete();
 

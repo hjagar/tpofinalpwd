@@ -53,7 +53,7 @@ class Kernel
             }
         }
         else {
-            return new Response('404 Not Found', HttpStatus::NOT_FOUND->value);
+            return ResponseError::notFound(); //new Response('404 Not Found', HttpStatus::NOT_FOUND->value);
         }
     }
 

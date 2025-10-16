@@ -4,6 +4,7 @@ namespace App\Controllers;
 
 use App\Models\Producto;
 use PhpMvc\Framework\Http\Request;
+use PhpMvc\Framework\Http\HttpStatus;
 
 class ProductController
 {
@@ -32,7 +33,7 @@ class ProductController
     {
         $producto = Producto::find($id);
         if (!$producto) {
-            abort(404, 'Producto not found');
+            abort(HttpStatus::NOT_FOUND->value, 'Producto no encontrado');
         }
         return view('admin.products.edit', compact('producto'));
     }
@@ -41,7 +42,7 @@ class ProductController
     {
         $producto = Producto::find($id);
         if (!$producto) {
-            abort(404, 'Producto not found');
+            abort(HttpStatus::NOT_FOUND->value, 'Producto no encontrado');
         }
         $producto->fill($request->all());
         $producto->save();
@@ -58,7 +59,7 @@ class ProductController
     {
         $producto = Producto::find($id);
         if (!$producto) {
-            abort(404, 'Producto not found');
+            abort(HttpStatus::NOT_FOUND->value, 'Producto no encontrado');
         }
         $producto->delete();
 

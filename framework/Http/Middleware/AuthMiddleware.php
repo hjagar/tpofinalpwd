@@ -7,7 +7,8 @@ use PhpMvc\Framework\Http\Request;
 
 class AuthMiddleware implements MiddlewareContract {
     public function handle(Request $request, Closure $next) {
-        if (!isset($_SESSION['user_id'])) {
+        if (!isset($_SESSION['user'])) {
+            $_SESSION['redirect'] = $request->uri;
             header('Location: /login');
             exit;
         }

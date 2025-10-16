@@ -4,6 +4,7 @@ namespace App\Controllers;
 
 use App\Models\Rol;
 use PhpMvc\Framework\Http\Request;
+use PhpMvc\Framework\Http\HttpStatus;
 
 class RoleController
 {
@@ -30,7 +31,7 @@ class RoleController
     {
         $role = Rol::find($id);
         if (!$role) {
-            abort(404, 'Role not found');
+            abort(HttpStatus::NOT_FOUND->value, 'Rol no encontrado');
         }
 
         return view('admin.roles.edit', compact('role'));
@@ -40,7 +41,7 @@ class RoleController
     {
         $role = Rol::find($id);
         if (!$role) {
-            abort(404, 'Role not found');
+            abort(HttpStatus::NOT_FOUND->value, 'Rol no encontrado');
         }
         $role->fill($request->all());
         $role->save();
@@ -57,7 +58,7 @@ class RoleController
     {
         $role = Rol::find($id);
         if (!$role) {
-            abort(404, 'Role not found');
+            abort(HttpStatus::NOT_FOUND->value, 'Rol no encontrado');
         }
         $role->delete();
 
